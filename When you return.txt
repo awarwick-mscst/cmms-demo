@@ -1,0 +1,11 @@
+  When you return, to start the system:
+
+  1. API (Terminal 1):
+  cd C:\Users\aaron\source\claude\demo\src\CMMS.API
+  dotnet run
+  2. Frontend (Terminal 2):
+  cd C:\Users\aaron\source\claude\demo\frontend
+  npm start
+  3. Open http://localhost:3000 and login with admin / Admin@123
+
+  See you tomorrow!
