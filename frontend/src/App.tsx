@@ -15,6 +15,14 @@ import { AssetDetailPage } from './pages/AssetDetailPage';
 import { AssetFormPage } from './pages/AssetFormPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { LocationsPage } from './pages/LocationsPage';
+import {
+  PartsPage,
+  PartFormPage,
+  PartDetailPage,
+  SuppliersPage,
+  PartCategoriesPage,
+  StorageLocationsPage,
+} from './pages/inventory';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +74,15 @@ const App: React.FC = () => {
                 <Route path="assets/:id/edit" element={<AssetFormPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
                 <Route path="locations" element={<LocationsPage />} />
+
+                {/* Inventory Routes */}
+                <Route path="inventory/parts" element={<PartsPage />} />
+                <Route path="inventory/parts/new" element={<PartFormPage />} />
+                <Route path="inventory/parts/:id" element={<PartDetailPage />} />
+                <Route path="inventory/parts/:id/edit" element={<PartFormPage />} />
+                <Route path="inventory/suppliers" element={<SuppliersPage />} />
+                <Route path="inventory/categories" element={<PartCategoriesPage />} />
+                <Route path="inventory/locations" element={<StorageLocationsPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

@@ -21,6 +21,13 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<AssetCategory>? _assetCategories;
     private IRepository<AssetLocation>? _assetLocations;
     private IRepository<AssetDocument>? _assetDocuments;
+    private IRepository<Supplier>? _suppliers;
+    private IRepository<PartCategory>? _partCategories;
+    private IRepository<StorageLocation>? _storageLocations;
+    private IRepository<Part>? _parts;
+    private IRepository<PartStock>? _partStocks;
+    private IRepository<PartTransaction>? _partTransactions;
+    private IRepository<AssetPart>? _assetParts;
 
     public UnitOfWork(CmmsDbContext context)
     {
@@ -38,6 +45,13 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<AssetCategory> AssetCategories => _assetCategories ??= new Repository<AssetCategory>(_context);
     public IRepository<AssetLocation> AssetLocations => _assetLocations ??= new Repository<AssetLocation>(_context);
     public IRepository<AssetDocument> AssetDocuments => _assetDocuments ??= new Repository<AssetDocument>(_context);
+    public IRepository<Supplier> Suppliers => _suppliers ??= new Repository<Supplier>(_context);
+    public IRepository<PartCategory> PartCategories => _partCategories ??= new Repository<PartCategory>(_context);
+    public IRepository<StorageLocation> StorageLocations => _storageLocations ??= new Repository<StorageLocation>(_context);
+    public IRepository<Part> Parts => _parts ??= new Repository<Part>(_context);
+    public IRepository<PartStock> PartStocks => _partStocks ??= new Repository<PartStock>(_context);
+    public IRepository<PartTransaction> PartTransactions => _partTransactions ??= new Repository<PartTransaction>(_context);
+    public IRepository<AssetPart> AssetParts => _assetParts ??= new Repository<AssetPart>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

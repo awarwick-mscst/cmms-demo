@@ -45,6 +45,10 @@ builder.Services.AddScoped<IAssetCategoryService, AssetCategoryService>();
 builder.Services.AddScoped<IAssetLocationService, AssetLocationService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPartCategoryService, PartCategoryService>();
+builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
+builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddHttpContextAccessor();
 
 // Add FluentValidation
@@ -130,6 +134,13 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAssertion(context =>
             context.User.HasClaim(c => c.Type == "permission" && c.Value == "asset-locations.delete") ||
             context.User.IsInRole("Administrator")));
+
+    // Inventory policies
+    options.AddPolicy("CanManageInventory", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "inventory.manage") ||
+            context.User.IsInRole("Administrator") ||
+            context.User.IsInRole("Inventory Manager")));
 });
 
 // Add CORS

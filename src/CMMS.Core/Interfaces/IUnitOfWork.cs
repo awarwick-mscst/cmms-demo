@@ -15,6 +15,13 @@ public interface IUnitOfWork : IDisposable
     IRepository<AssetCategory> AssetCategories { get; }
     IRepository<AssetLocation> AssetLocations { get; }
     IRepository<AssetDocument> AssetDocuments { get; }
+    IRepository<Supplier> Suppliers { get; }
+    IRepository<PartCategory> PartCategories { get; }
+    IRepository<StorageLocation> StorageLocations { get; }
+    IRepository<Part> Parts { get; }
+    IRepository<PartStock> PartStocks { get; }
+    IRepository<PartTransaction> PartTransactions { get; }
+    IRepository<AssetPart> AssetParts { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);

@@ -24,6 +24,15 @@ public class CmmsDbContext : DbContext
     public DbSet<AssetLocation> AssetLocations => Set<AssetLocation>();
     public DbSet<AssetDocument> AssetDocuments => Set<AssetDocument>();
 
+    // Inventory schema
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<PartCategory> PartCategories => Set<PartCategory>();
+    public DbSet<StorageLocation> StorageLocations => Set<StorageLocation>();
+    public DbSet<Part> Parts => Set<Part>();
+    public DbSet<PartStock> PartStocks => Set<PartStock>();
+    public DbSet<PartTransaction> PartTransactions => Set<PartTransaction>();
+    public DbSet<AssetPart> AssetParts => Set<AssetPart>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

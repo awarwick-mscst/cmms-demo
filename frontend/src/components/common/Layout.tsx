@@ -26,16 +26,39 @@ import {
   LocationOn as LocationIcon,
   AccountCircle,
   Logout as LogoutIcon,
+  Build as PartsIcon,
+  LocalShipping as SupplierIcon,
+  Warehouse as WarehouseIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
+import { Collapse } from '@mui/material';
 import { useAuth } from '../../hooks/useAuth';
 
 const drawerWidth = 240;
 
-const menuItems = [
+interface MenuItem {
+  text: string;
+  icon: React.ReactNode;
+  path?: string;
+  children?: MenuItem[];
+}
+
+const menuItems: MenuItem[] = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Assets', icon: <InventoryIcon />, path: '/assets' },
   { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
   { text: 'Locations', icon: <LocationIcon />, path: '/locations' },
+  {
+    text: 'Inventory',
+    icon: <PartsIcon />,
+    children: [
+      { text: 'Parts', icon: <PartsIcon />, path: '/inventory/parts' },
+      { text: 'Suppliers', icon: <SupplierIcon />, path: '/inventory/suppliers' },
+      { text: 'Part Categories', icon: <CategoryIcon />, path: '/inventory/categories' },
+      { text: 'Storage Locations', icon: <WarehouseIcon />, path: '/inventory/locations' },
+    ],
+  },
 ];
 
 export const Layout: React.FC = () => {
@@ -44,6 +67,7 @@ export const Layout: React.FC = () => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [inventoryOpen, setInventoryOpen] = useState(location.pathname.startsWith('/inventory'));
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -72,18 +96,51 @@ export const Layout: React.FC = () => {
       <Divider />
       <List>
         {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              selected={location.pathname === item.path}
-              onClick={() => {
-                navigate(item.path);
-                setMobileOpen(false);
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
+          <React.Fragment key={item.text}>
+            {item.children ? (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton onClick={() => setInventoryOpen(!inventoryOpen)}>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.text} />
+                    {inventoryOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </ListItemButton>
+                </ListItem>
+                <Collapse in={inventoryOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {item.children.map((child) => (
+                      <ListItem key={child.text} disablePadding>
+                        <ListItemButton
+                          sx={{ pl: 4 }}
+                          selected={location.pathname === child.path}
+                          onClick={() => {
+                            navigate(child.path!);
+                            setMobileOpen(false);
+                          }}
+                        >
+                          <ListItemIcon>{child.icon}</ListItemIcon>
+                          <ListItemText primary={child.text} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            ) : (
+              <ListItem disablePadding>
+                <ListItemButton
+                  selected={location.pathname === item.path}
+                  onClick={() => {
+                    navigate(item.path!);
+                    setMobileOpen(false);
+                  }}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            )}
+          </React.Fragment>
         ))}
       </List>
     </div>
