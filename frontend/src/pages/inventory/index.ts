@@ -4,3 +4,4 @@ export { PartDetailPage } from './PartDetailPage';
 export { SuppliersPage } from './SuppliersPage';
 export { PartCategoriesPage } from './PartCategoriesPage';
 export { StorageLocationsPage } from './StorageLocationsPage';
+export { ReceiveInventoryPage } from './ReceiveInventoryPage';

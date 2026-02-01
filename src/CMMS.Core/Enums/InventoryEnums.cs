@@ -32,6 +32,7 @@ public enum UnitOfMeasure
     Foot,
     Meter,
     Gallon,
+    Quart,
     Liter,
     Pound,
     Kilogram,

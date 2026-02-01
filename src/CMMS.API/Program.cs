@@ -1,6 +1,7 @@
 using System.Text;
 using CMMS.API.Middleware;
 using CMMS.API.Services;
+using CMMS.Core.Configuration;
 using CMMS.Core.Interfaces;
 using CMMS.Infrastructure.Data;
 using CMMS.Infrastructure.Repositories;
@@ -39,7 +40,6 @@ builder.Services.AddDbContext<CmmsDbContext>(options =>
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IAssetCategoryService, AssetCategoryService>();
 builder.Services.AddScoped<IAssetLocationService, AssetLocationService>();
@@ -49,6 +49,32 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IPartCategoryService, PartCategoryService>();
 builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
 builder.Services.AddScoped<IPartService, PartService>();
+builder.Services.AddScoped<IWorkOrderService, WorkOrderService>();
+builder.Services.AddScoped<IPreventiveMaintenanceService, PreventiveMaintenanceService>();
+builder.Services.AddScoped<ILabelService, LabelService>();
+builder.Services.AddScoped<IPrintService, PrintService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
+// Configure LDAP settings
+builder.Services.Configure<LdapSettings>(builder.Configuration.GetSection(LdapSettings.SectionName));
+var ldapSettings = builder.Configuration.GetSection(LdapSettings.SectionName).Get<LdapSettings>() ?? new LdapSettings();
+
+// Register LDAP service - use NullLdapService when disabled for better performance
+if (ldapSettings.Enabled)
+{
+    builder.Services.AddScoped<ILdapService, LdapService>();
+    Log.Information("LDAP authentication enabled - Server: {Server}, Mode: {Mode}",
+        ldapSettings.Server, ldapSettings.AuthenticationMode);
+}
+else
+{
+    builder.Services.AddSingleton<ILdapService, NullLdapService>();
+    Log.Information("LDAP authentication disabled - using local authentication only");
+}
+
+// Register AuthService (depends on ILdapService)
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddHttpContextAccessor();
 
 // Add FluentValidation
@@ -141,6 +167,66 @@ builder.Services.AddAuthorization(options =>
             context.User.HasClaim(c => c.Type == "permission" && c.Value == "inventory.manage") ||
             context.User.IsInRole("Administrator") ||
             context.User.IsInRole("Inventory Manager")));
+
+    // Work Order policies
+    options.AddPolicy("CanViewWorkOrders", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "work-orders.view") ||
+            context.User.IsInRole("Administrator") ||
+            context.User.IsInRole("Technician")));
+
+    options.AddPolicy("CanCreateWorkOrders", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "work-orders.create") ||
+            context.User.IsInRole("Administrator") ||
+            context.User.IsInRole("Technician")));
+
+    options.AddPolicy("CanEditWorkOrders", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "work-orders.edit") ||
+            context.User.IsInRole("Administrator") ||
+            context.User.IsInRole("Technician")));
+
+    options.AddPolicy("CanDeleteWorkOrders", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "work-orders.delete") ||
+            context.User.IsInRole("Administrator")));
+
+    // Preventive Maintenance policies
+    options.AddPolicy("CanViewPreventiveMaintenance", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "preventive-maintenance.view") ||
+            context.User.IsInRole("Administrator") ||
+            context.User.IsInRole("Technician")));
+
+    options.AddPolicy("CanManagePreventiveMaintenance", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "preventive-maintenance.manage") ||
+            context.User.IsInRole("Administrator")));
+
+    // User Management policies
+    options.AddPolicy("CanViewUsers", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "users.view") ||
+            context.User.IsInRole("Administrator")));
+
+    options.AddPolicy("CanManageUsers", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "users.manage") ||
+            context.User.IsInRole("Administrator")));
+
+    // Label Printing policies
+    options.AddPolicy("CanPrintLabels", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "labels.print") ||
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "inventory.manage") ||
+            context.User.IsInRole("Administrator") ||
+            context.User.IsInRole("Inventory Manager")));
+
+    options.AddPolicy("CanManageLabels", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "permission" && c.Value == "labels.manage") ||
+            context.User.IsInRole("Administrator")));
 });
 
 // Add CORS
@@ -244,8 +330,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// CORS must come before HTTPS redirection to handle preflight OPTIONS requests
 app.UseCors("CorsPolicy");
+
+// Only use HTTPS redirection in production to avoid breaking CORS in development
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

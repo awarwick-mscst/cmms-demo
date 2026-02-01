@@ -31,12 +31,14 @@ import {
   Edit as EditIcon,
   Add as AddIcon,
   SwapHoriz as TransferIcon,
+  Print as PrintIcon,
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { partService } from '../../services/partService';
 import { storageLocationService } from '../../services/storageLocationService';
 import { PartDetail, StockAdjustmentRequest, StockTransferRequest, TransactionTypes } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { PrintLabelDialog } from '../../components/inventory/PrintLabelDialog';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -73,6 +75,7 @@ export const PartDetailPage: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [adjustDialogOpen, setAdjustDialogOpen] = useState(false);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [adjustmentData, setAdjustmentData] = useState<StockAdjustmentRequest>({
     locationId: 0,
     transactionType: 'Receive',
@@ -152,6 +155,15 @@ export const PartDetailPage: React.FC = () => {
           <Chip label={part.partNumber} variant="outlined" />
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
+          {(hasPermission('inventory.manage') || hasPermission('labels.print')) && (
+            <Button
+              variant="outlined"
+              startIcon={<PrintIcon />}
+              onClick={() => setPrintDialogOpen(true)}
+            >
+              Print Label
+            </Button>
+          )}
           {hasPermission('inventory.manage') && (
             <>
               <Button
@@ -509,6 +521,15 @@ export const PartDetailPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Print Label Dialog */}
+      <PrintLabelDialog
+        open={printDialogOpen}
+        onClose={() => setPrintDialogOpen(false)}
+        partId={Number(id)}
+        partNumber={part.partNumber}
+        partName={part.name}
+      />
     </Box>
   );
 };

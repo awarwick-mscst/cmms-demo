@@ -23,6 +23,18 @@ public interface IUnitOfWork : IDisposable
     IRepository<PartTransaction> PartTransactions { get; }
     IRepository<AssetPart> AssetParts { get; }
 
+    // Maintenance
+    IRepository<WorkOrder> WorkOrders { get; }
+    IRepository<WorkOrderHistory> WorkOrderHistory { get; }
+    IRepository<WorkOrderComment> WorkOrderComments { get; }
+    IRepository<WorkOrderLabor> WorkOrderLabor { get; }
+    IRepository<PreventiveMaintenanceSchedule> PreventiveMaintenanceSchedules { get; }
+    IRepository<WorkSession> WorkSessions { get; }
+
+    // Admin
+    IRepository<LabelTemplate> LabelTemplates { get; }
+    IRepository<LabelPrinter> LabelPrinters { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);

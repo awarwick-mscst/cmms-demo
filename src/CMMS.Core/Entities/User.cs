@@ -1,3 +1,5 @@
+using CMMS.Core.Enums;
+
 namespace CMMS.Core.Entities;
 
 public class User : BaseEntity
@@ -14,6 +16,12 @@ public class User : BaseEntity
     public DateTime? LockoutEnd { get; set; }
     public DateTime? LastLoginAt { get; set; }
     public DateTime? PasswordChangedAt { get; set; }
+
+    // LDAP/Active Directory properties
+    public bool IsLdapUser { get; set; }
+    public string? LdapDistinguishedName { get; set; }
+    public DateTime? LdapLastSyncAt { get; set; }
+    public AuthenticationType AuthenticationType { get; set; } = AuthenticationType.Local;
 
     public string FullName => $"{FirstName} {LastName}";
 

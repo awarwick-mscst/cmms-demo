@@ -18,4 +18,5 @@ public class AssetPart : BaseEntityWithoutAudit
     public virtual Asset Asset { get; set; } = null!;
     public virtual Part Part { get; set; } = null!;
     public virtual User? UsedByUser { get; set; }
+    public virtual WorkOrder? WorkOrder { get; set; }
 }

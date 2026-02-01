@@ -15,6 +15,7 @@ import {
   StockReserveRequest,
   CreateAssetPartRequest,
   PartTransactionFilter,
+  StorageLocation,
 } from '../types';
 
 export const partService = {
@@ -105,6 +106,12 @@ export const partService = {
   // Asset Parts
   usePartOnAsset: async (partId: number, request: CreateAssetPartRequest): Promise<ApiResponse<AssetPart>> => {
     const response = await api.post<ApiResponse<AssetPart>>(`/parts/${partId}/use-on-asset`, request);
+    return response.data;
+  },
+
+  // Storage Locations
+  getStorageLocations: async (): Promise<ApiResponse<StorageLocation[]>> => {
+    const response = await api.get<ApiResponse<StorageLocation[]>>('/storage-locations');
     return response.data;
   },
 };

@@ -22,7 +22,30 @@ import {
   SuppliersPage,
   PartCategoriesPage,
   StorageLocationsPage,
+  ReceiveInventoryPage,
 } from './pages/inventory';
+import { WorkOrdersPage } from './pages/maintenance/WorkOrdersPage';
+import { WorkOrderFormPage } from './pages/maintenance/WorkOrderFormPage';
+import { WorkOrderDetailPage } from './pages/maintenance/WorkOrderDetailPage';
+import { PreventiveMaintenancePage } from './pages/maintenance/PreventiveMaintenancePage';
+import { PMScheduleFormPage } from './pages/maintenance/PMScheduleFormPage';
+import { MyWorkOrdersPage } from './pages/maintenance/MyWorkOrdersPage';
+import { UsersPage } from './pages/admin/UsersPage';
+import { UserFormPage } from './pages/admin/UserFormPage';
+import { HelpPage } from './pages/admin/HelpPage';
+import { PrintersPage } from './pages/admin/PrintersPage';
+import { LabelTemplatesPage } from './pages/admin/LabelTemplatesPage';
+import { LabelTemplateFormPage } from './pages/admin/LabelTemplateFormPage';
+import {
+  ReportsPage,
+  ReorderReportPage,
+  OverdueMaintenancePage,
+  MaintenancePerformedPage,
+  InventoryValuationPage,
+  PMCompliancePage,
+  StockMovementPage,
+  WorkOrderSummaryPage,
+} from './pages/reports';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +99,7 @@ const App: React.FC = () => {
                 <Route path="locations" element={<LocationsPage />} />
 
                 {/* Inventory Routes */}
+                <Route path="inventory/receive" element={<ReceiveInventoryPage />} />
                 <Route path="inventory/parts" element={<PartsPage />} />
                 <Route path="inventory/parts/new" element={<PartFormPage />} />
                 <Route path="inventory/parts/:id" element={<PartDetailPage />} />
@@ -83,6 +107,36 @@ const App: React.FC = () => {
                 <Route path="inventory/suppliers" element={<SuppliersPage />} />
                 <Route path="inventory/categories" element={<PartCategoriesPage />} />
                 <Route path="inventory/locations" element={<StorageLocationsPage />} />
+
+                {/* Maintenance Routes */}
+                <Route path="maintenance/my-work" element={<MyWorkOrdersPage />} />
+                <Route path="maintenance/work-orders" element={<WorkOrdersPage />} />
+                <Route path="maintenance/work-orders/new" element={<WorkOrderFormPage />} />
+                <Route path="maintenance/work-orders/:id" element={<WorkOrderDetailPage />} />
+                <Route path="maintenance/work-orders/:id/edit" element={<WorkOrderFormPage />} />
+                <Route path="maintenance/pm-schedules" element={<PreventiveMaintenancePage />} />
+                <Route path="maintenance/pm-schedules/new" element={<PMScheduleFormPage />} />
+                <Route path="maintenance/pm-schedules/:id/edit" element={<PMScheduleFormPage />} />
+
+                {/* Reports Routes */}
+                <Route path="reports" element={<ReportsPage />} />
+                <Route path="reports/reorder" element={<ReorderReportPage />} />
+                <Route path="reports/inventory-valuation" element={<InventoryValuationPage />} />
+                <Route path="reports/stock-movement" element={<StockMovementPage />} />
+                <Route path="reports/overdue-maintenance" element={<OverdueMaintenancePage />} />
+                <Route path="reports/maintenance-performed" element={<MaintenancePerformedPage />} />
+                <Route path="reports/pm-compliance" element={<PMCompliancePage />} />
+                <Route path="reports/work-order-summary" element={<WorkOrderSummaryPage />} />
+
+                {/* Admin Routes */}
+                <Route path="admin/users" element={<UsersPage />} />
+                <Route path="admin/users/new" element={<UserFormPage />} />
+                <Route path="admin/users/:id/edit" element={<UserFormPage />} />
+                <Route path="admin/printers" element={<PrintersPage />} />
+                <Route path="admin/label-templates" element={<LabelTemplatesPage />} />
+                <Route path="admin/label-templates/new" element={<LabelTemplateFormPage />} />
+                <Route path="admin/label-templates/:id/edit" element={<LabelTemplateFormPage />} />
+                <Route path="admin/help" element={<HelpPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

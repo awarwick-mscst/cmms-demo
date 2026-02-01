@@ -33,6 +33,18 @@ public class CmmsDbContext : DbContext
     public DbSet<PartTransaction> PartTransactions => Set<PartTransaction>();
     public DbSet<AssetPart> AssetParts => Set<AssetPart>();
 
+    // Maintenance schema
+    public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+    public DbSet<WorkOrderHistory> WorkOrderHistory => Set<WorkOrderHistory>();
+    public DbSet<WorkOrderComment> WorkOrderComments => Set<WorkOrderComment>();
+    public DbSet<WorkOrderLabor> WorkOrderLabor => Set<WorkOrderLabor>();
+    public DbSet<PreventiveMaintenanceSchedule> PreventiveMaintenanceSchedules => Set<PreventiveMaintenanceSchedule>();
+    public DbSet<WorkSession> WorkSessions => Set<WorkSession>();
+
+    // Admin schema
+    public DbSet<LabelTemplate> LabelTemplates => Set<LabelTemplate>();
+    public DbSet<LabelPrinter> LabelPrinters => Set<LabelPrinter>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

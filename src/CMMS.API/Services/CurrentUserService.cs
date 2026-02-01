@@ -26,6 +26,10 @@ public class CurrentUserService : ICurrentUserService
     public string? Username =>
         _httpContextAccessor.HttpContext?.User.FindFirstValue("username");
 
+    public string? FullName =>
+        _httpContextAccessor.HttpContext?.User.FindFirstValue("fullName")
+        ?? _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
+
     public IEnumerable<string> Roles =>
         _httpContextAccessor.HttpContext?.User.FindAll(ClaimTypes.Role).Select(c => c.Value)
         ?? Enumerable.Empty<string>();

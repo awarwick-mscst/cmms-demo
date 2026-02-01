@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Box,
+  Chip,
   CssBaseline,
   Divider,
   Drawer,
@@ -31,9 +32,21 @@ import {
   Warehouse as WarehouseIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Engineering as MaintenanceIcon,
+  Assignment as WorkOrderIcon,
+  Schedule as ScheduleIcon,
+  AdminPanelSettings as AdminIcon,
+  People as PeopleIcon,
+  Timer as TimerIcon,
+  Help as HelpIcon,
+  Print as PrintIcon,
+  Label as LabelIcon,
+  Assessment as ReportsIcon,
 } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
+import { workOrderService } from '../../services/workOrderService';
 
 const drawerWidth = 240;
 
@@ -50,13 +63,34 @@ const menuItems: MenuItem[] = [
   { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
   { text: 'Locations', icon: <LocationIcon />, path: '/locations' },
   {
+    text: 'Maintenance',
+    icon: <MaintenanceIcon />,
+    children: [
+      { text: 'My Work', icon: <TimerIcon />, path: '/maintenance/my-work' },
+      { text: 'Work Orders', icon: <WorkOrderIcon />, path: '/maintenance/work-orders' },
+      { text: 'PM Schedules', icon: <ScheduleIcon />, path: '/maintenance/pm-schedules' },
+    ],
+  },
+  {
     text: 'Inventory',
     icon: <PartsIcon />,
     children: [
+      { text: 'Receive', icon: <WarehouseIcon />, path: '/inventory/receive' },
       { text: 'Parts', icon: <PartsIcon />, path: '/inventory/parts' },
       { text: 'Suppliers', icon: <SupplierIcon />, path: '/inventory/suppliers' },
       { text: 'Part Categories', icon: <CategoryIcon />, path: '/inventory/categories' },
       { text: 'Storage Locations', icon: <WarehouseIcon />, path: '/inventory/locations' },
+    ],
+  },
+  { text: 'Reports', icon: <ReportsIcon />, path: '/reports' },
+  {
+    text: 'Admin',
+    icon: <AdminIcon />,
+    children: [
+      { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
+      { text: 'Label Printers', icon: <PrintIcon />, path: '/admin/printers' },
+      { text: 'Label Templates', icon: <LabelIcon />, path: '/admin/label-templates' },
+      { text: 'Help', icon: <HelpIcon />, path: '/admin/help' },
     ],
   },
 ];
@@ -67,7 +101,48 @@ export const Layout: React.FC = () => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [inventoryOpen, setInventoryOpen] = useState(location.pathname.startsWith('/inventory'));
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
+    Inventory: location.pathname.startsWith('/inventory'),
+    Maintenance: location.pathname.startsWith('/maintenance'),
+    Admin: location.pathname.startsWith('/admin'),
+  });
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  // Query for active work session
+  const { data: sessionData } = useQuery({
+    queryKey: ['myActiveSession'],
+    queryFn: () => workOrderService.getMyActiveSession(),
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const activeSession = sessionData?.data;
+
+  // Update elapsed time for active session
+  useEffect(() => {
+    if (activeSession?.isActive) {
+      const startTime = new Date(activeSession.startedAt).getTime();
+      const updateTimer = () => {
+        const now = Date.now();
+        setElapsedTime(Math.floor((now - startTime) / 1000));
+      };
+      updateTimer();
+      const interval = setInterval(updateTimer, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setElapsedTime(0);
+    }
+  }, [activeSession]);
+
+  const formatElapsedTime = (seconds: number) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const toggleMenu = (menuName: string) => {
+    setOpenMenus((prev) => ({ ...prev, [menuName]: !prev[menuName] }));
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -100,13 +175,13 @@ export const Layout: React.FC = () => {
             {item.children ? (
               <>
                 <ListItem disablePadding>
-                  <ListItemButton onClick={() => setInventoryOpen(!inventoryOpen)}>
+                  <ListItemButton onClick={() => toggleMenu(item.text)}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText primary={item.text} />
-                    {inventoryOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    {openMenus[item.text] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                   </ListItemButton>
                 </ListItem>
-                <Collapse in={inventoryOpen} timeout="auto" unmountOnExit>
+                <Collapse in={openMenus[item.text]} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     {item.children.map((child) => (
                       <ListItem key={child.text} disablePadding>
@@ -169,6 +244,20 @@ export const Layout: React.FC = () => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {menuItems.find((item) => item.path === location.pathname)?.text || 'CMMS'}
           </Typography>
+          {activeSession?.isActive && (
+            <Chip
+              icon={<TimerIcon />}
+              label={`Working: ${formatElapsedTime(elapsedTime)}`}
+              color="success"
+              onClick={() => navigate(`/maintenance/work-orders/${activeSession.workOrderId}`)}
+              sx={{
+                mr: 2,
+                fontFamily: 'monospace',
+                cursor: 'pointer',
+                '&:hover': { bgcolor: 'success.dark' },
+              }}
+            />
+          )}
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
               {user?.firstName?.[0] || 'U'}

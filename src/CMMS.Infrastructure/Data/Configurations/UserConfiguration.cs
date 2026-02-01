@@ -63,6 +63,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordChangedAt)
             .HasColumnName("password_changed_at");
 
+        // LDAP/Active Directory properties
+        builder.Property(u => u.IsLdapUser)
+            .HasColumnName("is_ldap_user")
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.LdapDistinguishedName)
+            .HasColumnName("ldap_distinguished_name")
+            .HasMaxLength(500);
+
+        builder.Property(u => u.LdapLastSyncAt)
+            .HasColumnName("ldap_last_sync_at");
+
+        builder.Property(u => u.AuthenticationType)
+            .HasColumnName("authentication_type")
+            .HasDefaultValue(CMMS.Core.Enums.AuthenticationType.Local);
+
         builder.Property(u => u.CreatedAt)
             .HasColumnName("created_at")
             .HasDefaultValueSql("GETUTCDATE()");

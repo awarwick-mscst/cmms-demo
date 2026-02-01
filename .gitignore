@@ -480,3 +480,11 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Build output
+
+frontend/build/
+
+# System files
+
+nul

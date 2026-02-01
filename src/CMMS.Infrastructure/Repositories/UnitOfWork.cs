@@ -28,6 +28,14 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<PartStock>? _partStocks;
     private IRepository<PartTransaction>? _partTransactions;
     private IRepository<AssetPart>? _assetParts;
+    private IRepository<WorkOrder>? _workOrders;
+    private IRepository<WorkOrderHistory>? _workOrderHistory;
+    private IRepository<WorkOrderComment>? _workOrderComments;
+    private IRepository<WorkOrderLabor>? _workOrderLabor;
+    private IRepository<PreventiveMaintenanceSchedule>? _preventiveMaintenanceSchedules;
+    private IRepository<WorkSession>? _workSessions;
+    private IRepository<LabelTemplate>? _labelTemplates;
+    private IRepository<LabelPrinter>? _labelPrinters;
 
     public UnitOfWork(CmmsDbContext context)
     {
@@ -52,6 +60,14 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<PartStock> PartStocks => _partStocks ??= new Repository<PartStock>(_context);
     public IRepository<PartTransaction> PartTransactions => _partTransactions ??= new Repository<PartTransaction>(_context);
     public IRepository<AssetPart> AssetParts => _assetParts ??= new Repository<AssetPart>(_context);
+    public IRepository<WorkOrder> WorkOrders => _workOrders ??= new Repository<WorkOrder>(_context);
+    public IRepository<WorkOrderHistory> WorkOrderHistory => _workOrderHistory ??= new Repository<WorkOrderHistory>(_context);
+    public IRepository<WorkOrderComment> WorkOrderComments => _workOrderComments ??= new Repository<WorkOrderComment>(_context);
+    public IRepository<WorkOrderLabor> WorkOrderLabor => _workOrderLabor ??= new Repository<WorkOrderLabor>(_context);
+    public IRepository<PreventiveMaintenanceSchedule> PreventiveMaintenanceSchedules => _preventiveMaintenanceSchedules ??= new Repository<PreventiveMaintenanceSchedule>(_context);
+    public IRepository<WorkSession> WorkSessions => _workSessions ??= new Repository<WorkSession>(_context);
+    public IRepository<LabelTemplate> LabelTemplates => _labelTemplates ??= new Repository<LabelTemplate>(_context);
+    public IRepository<LabelPrinter> LabelPrinters => _labelPrinters ??= new Repository<LabelPrinter>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

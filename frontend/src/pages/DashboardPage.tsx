@@ -8,6 +8,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { assetService } from '../services/assetService';
+import { AvailabilityWidget, WorkOrdersWidget } from '../components/dashboard';
 
 interface StatCardProps {
   title: string;
@@ -103,15 +104,14 @@ export const DashboardPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Paper sx={{ p: 3, mt: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          Welcome to CMMS
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Use the sidebar to navigate to different sections of the system. You can manage assets,
-          categories, and locations from their respective pages.
-        </Typography>
-      </Paper>
+      <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid item xs={12} md={6} lg={4}>
+          <AvailabilityWidget />
+        </Grid>
+        <Grid item xs={12} md={6} lg={8}>
+          <WorkOrdersWidget />
+        </Grid>
+      </Grid>
     </Box>
   );
 };

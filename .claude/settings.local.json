@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet run)"
+      "Bash(dotnet run)",
+      "Bash(dotnet build:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c \"taskkill /PID 177140 /F\")",
+      "Bash(cmd /c \"taskkill /IM CMMS.API.exe /F\")",
+      "Bash(powershell -Command \"Stop-Process -Id 177140 -Force -ErrorAction SilentlyContinue; Get-Process | Where-Object {$_Name -like ''*CMMS*''} | Stop-Process -Force\")",
+      "Bash(npm run build:*)",
+      "Bash(powershell -Command \"Get-Process -Name ''CMMS.API'' -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(tree:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

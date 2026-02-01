@@ -437,3 +437,655 @@ export const PartStatuses = ['Active', 'Inactive', 'Obsolete', 'Discontinued'] a
 export const TransactionTypes = ['Receive', 'Issue', 'Adjust', 'Transfer', 'Reserve', 'Unreserve'] as const;
 export const ReorderStatuses = ['Ok', 'Low', 'Critical', 'OutOfStock'] as const;
 export const UnitsOfMeasure = ['Each', 'Foot', 'Meter', 'Gallon', 'Liter', 'Pound', 'Kilogram', 'Box', 'Case', 'Roll', 'Set', 'Pair'] as const;
+
+// Work Order Types
+
+export interface WorkOrder {
+  id: number;
+  workOrderNumber: string;
+  type: string;
+  priority: string;
+  status: string;
+  title: string;
+  description?: string;
+  assetId?: number;
+  assetName?: string;
+  assetTag?: string;
+  locationId?: number;
+  locationName?: string;
+  requestedBy?: string;
+  requestedDate?: string;
+  assignedToId?: number;
+  assignedToName?: string;
+  scheduledStartDate?: string;
+  scheduledEndDate?: string;
+  actualStartDate?: string;
+  actualEndDate?: string;
+  estimatedHours?: number;
+  actualHours?: number;
+  completionNotes?: string;
+  preventiveMaintenanceScheduleId?: number;
+  preventiveMaintenanceScheduleName?: string;
+  createdAt: string;
+  updatedAt?: string;
+  createdByName?: string;
+}
+
+export interface WorkOrderSummary {
+  id: number;
+  workOrderNumber: string;
+  type: string;
+  priority: string;
+  status: string;
+  title: string;
+  assetName?: string;
+  locationName?: string;
+  assignedToName?: string;
+  scheduledStartDate?: string;
+  scheduledEndDate?: string;
+  createdAt: string;
+}
+
+export interface CreateWorkOrderRequest {
+  type?: string;
+  priority?: string;
+  title: string;
+  description?: string;
+  assetId?: number;
+  locationId?: number;
+  requestedBy?: string;
+  requestedDate?: string;
+  assignedToId?: number;
+  scheduledStartDate?: string;
+  scheduledEndDate?: string;
+  estimatedHours?: number;
+}
+
+export interface UpdateWorkOrderRequest extends CreateWorkOrderRequest {}
+
+export interface CompleteWorkOrderRequest {
+  completionNotes?: string;
+  actualEndDate?: string;
+}
+
+export interface WorkOrderStatusChangeRequest {
+  notes?: string;
+}
+
+export interface WorkOrderFilter {
+  search?: string;
+  type?: string;
+  status?: string;
+  priority?: string;
+  assetId?: number;
+  locationId?: number;
+  assignedToId?: number;
+  scheduledStartFrom?: string;
+  scheduledStartTo?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDescending?: boolean;
+}
+
+export interface WorkOrderDashboard {
+  totalCount: number;
+  byStatus: Record<string, number>;
+  byType: Record<string, number>;
+  byPriority: Record<string, number>;
+  overdueCount: number;
+  dueThisWeekCount: number;
+}
+
+export interface WorkOrderHistory {
+  id: number;
+  workOrderId: number;
+  fromStatus?: string;
+  toStatus: string;
+  changedById: number;
+  changedByName: string;
+  changedAt: string;
+  notes?: string;
+}
+
+export interface WorkOrderComment {
+  id: number;
+  workOrderId: number;
+  comment: string;
+  isInternal: boolean;
+  createdById: number;
+  createdByName: string;
+  createdAt: string;
+}
+
+export interface CreateWorkOrderCommentRequest {
+  comment: string;
+  isInternal?: boolean;
+}
+
+export interface WorkOrderLabor {
+  id: number;
+  workOrderId: number;
+  userId: number;
+  userName: string;
+  workDate: string;
+  hoursWorked: number;
+  laborType: string;
+  hourlyRate?: number;
+  totalCost?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CreateWorkOrderLaborRequest {
+  userId: number;
+  workDate: string;
+  hoursWorked: number;
+  laborType?: string;
+  hourlyRate?: number;
+  notes?: string;
+}
+
+export interface WorkOrderLaborSummary {
+  totalHours: number;
+  totalCost: number;
+  hoursByType: Record<string, number>;
+}
+
+export interface WorkOrderPart {
+  id: number;
+  assetId: number;
+  assetName: string;
+  partId: number;
+  partNumber: string;
+  partName: string;
+  quantityUsed: number;
+  unitCostAtTime: number;
+  totalCost: number;
+  usedDate: string;
+  notes?: string;
+}
+
+// Preventive Maintenance Types
+
+export interface PreventiveMaintenanceSchedule {
+  id: number;
+  name: string;
+  description?: string;
+  assetId?: number;
+  assetName?: string;
+  assetTag?: string;
+  frequencyType: string;
+  frequencyValue: number;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+  nextDueDate?: string;
+  lastCompletedDate?: string;
+  leadTimeDays: number;
+  workOrderTitle: string;
+  workOrderDescription?: string;
+  priority: string;
+  estimatedHours?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PreventiveMaintenanceScheduleSummary {
+  id: number;
+  name: string;
+  assetName?: string;
+  frequencyType: string;
+  frequencyValue: number;
+  nextDueDate?: string;
+  lastCompletedDate?: string;
+  priority: string;
+  isActive: boolean;
+}
+
+export interface CreatePreventiveMaintenanceScheduleRequest {
+  name: string;
+  description?: string;
+  assetId?: number;
+  frequencyType?: string;
+  frequencyValue?: number;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+  nextDueDate?: string;
+  leadTimeDays?: number;
+  workOrderTitle: string;
+  workOrderDescription?: string;
+  priority?: string;
+  estimatedHours?: number;
+  isActive?: boolean;
+}
+
+export interface UpdatePreventiveMaintenanceScheduleRequest extends CreatePreventiveMaintenanceScheduleRequest {}
+
+export interface PreventiveMaintenanceScheduleFilter {
+  search?: string;
+  assetId?: number;
+  frequencyType?: string;
+  isActive?: boolean;
+  dueBefore?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDescending?: boolean;
+}
+
+export interface UpcomingMaintenance {
+  scheduleId: number;
+  scheduleName: string;
+  assetId?: number;
+  assetName?: string;
+  dueDate: string;
+  daysUntilDue: number;
+  priority: string;
+}
+
+export interface GenerateWorkOrdersResult {
+  schedulesProcessed: number;
+  workOrdersCreated: number;
+  createdWorkOrderIds: number[];
+  errors: string[];
+}
+
+export const WorkOrderTypes = ['Repair', 'ScheduledJob', 'SafetyInspection', 'PreventiveMaintenance'] as const;
+export const WorkOrderStatuses = ['Draft', 'Open', 'InProgress', 'OnHold', 'Completed', 'Cancelled'] as const;
+export const WorkOrderPriorities = ['Low', 'Medium', 'High', 'Critical', 'Emergency'] as const;
+export const LaborTypes = ['Regular', 'Overtime', 'Emergency'] as const;
+export const FrequencyTypes = ['Daily', 'Weekly', 'BiWeekly', 'Monthly', 'Quarterly', 'SemiAnnually', 'Annually', 'Custom'] as const;
+
+// Work Session Types (Active Time Tracking)
+
+export interface WorkSession {
+  id: number;
+  workOrderId: number;
+  workOrderNumber: string;
+  workOrderTitle: string;
+  userId: number;
+  userName: string;
+  startedAt: string;
+  endedAt?: string;
+  hoursWorked?: number;
+  notes?: string;
+  isActive: boolean;
+  elapsedMinutes: number;
+}
+
+export interface StopSessionRequest {
+  notes?: string;
+}
+
+export interface AddSessionNoteRequest {
+  note: string;
+}
+
+// Label Printing Types
+
+export interface LabelTemplate {
+  id: number;
+  name: string;
+  description?: string;
+  width: number;
+  height: number;
+  dpi: number;
+  elementsJson: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateLabelTemplateRequest {
+  name: string;
+  description?: string;
+  width?: number;
+  height?: number;
+  dpi?: number;
+  elementsJson: string;
+  isDefault?: boolean;
+}
+
+export interface UpdateLabelTemplateRequest {
+  name: string;
+  description?: string;
+  width: number;
+  height: number;
+  dpi: number;
+  elementsJson: string;
+  isDefault: boolean;
+}
+
+export interface LabelPrinter {
+  id: number;
+  name: string;
+  ipAddress: string;
+  port: number;
+  printerModel?: string;
+  dpi: number;
+  isActive: boolean;
+  isDefault: boolean;
+  location?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateLabelPrinterRequest {
+  name: string;
+  ipAddress: string;
+  port?: number;
+  printerModel?: string;
+  dpi?: number;
+  isActive?: boolean;
+  isDefault?: boolean;
+  location?: string;
+}
+
+export interface UpdateLabelPrinterRequest {
+  name: string;
+  ipAddress: string;
+  port: number;
+  printerModel?: string;
+  dpi: number;
+  isActive: boolean;
+  isDefault: boolean;
+  location?: string;
+}
+
+export interface PrintLabelRequest {
+  partId: number;
+  templateId?: number;
+  printerId?: number;
+  quantity?: number;
+}
+
+export interface PrintPreviewRequest {
+  partId: number;
+  templateId?: number;
+}
+
+export interface PrintPreviewResponse {
+  zpl: string;
+  templateName: string;
+  width: number;
+  height: number;
+}
+
+export interface PrintResult {
+  success: boolean;
+  message?: string;
+  printerName?: string;
+  labelsPrinted: number;
+}
+
+export interface PrinterTestResult {
+  success: boolean;
+  message?: string;
+}
+
+export interface LabelElement {
+  type: string;
+  field: string;
+  x: number;
+  y: number;
+  fontSize?: number;
+  height?: number;
+  maxWidth?: number;
+  format?: string;
+}
+
+export const LabelFieldOptions = [
+  { value: 'description', label: 'Description' },
+  { value: 'partNumber', label: 'Part Number' },
+  { value: 'manufacturerPartNumber', label: 'Manufacturer Part Number' },
+  { value: 'name', label: 'Name' },
+  { value: 'manufacturer', label: 'Manufacturer' },
+  { value: 'barcode', label: 'Barcode' },
+] as const;
+
+export const DpiOptions = [203, 300, 600] as const;
+
+// Report Types
+
+export interface ReorderReportItem {
+  partId: number;
+  partNumber: string;
+  name: string;
+  categoryName?: string;
+  supplierName?: string;
+  quantityOnHand: number;
+  quantityAvailable: number;
+  reorderPoint: number;
+  reorderQuantity: number;
+  quantityToOrder: number;
+  unitCost: number;
+  estimatedCost: number;
+  reorderStatus: string;
+  leadTimeDays: number;
+}
+
+export interface ReorderReportFilter {
+  categoryId?: number;
+  supplierId?: number;
+  status?: string;
+}
+
+export interface InventoryValuationReport {
+  totalValue: number;
+  totalParts: number;
+  totalQuantity: number;
+  items: InventoryValuationItem[];
+  byCategory: ValuationByCategory[];
+  byLocation: ValuationByLocation[];
+}
+
+export interface InventoryValuationItem {
+  partId: number;
+  partNumber: string;
+  name: string;
+  categoryName?: string;
+  quantityOnHand: number;
+  unitCost: number;
+  totalValue: number;
+}
+
+export interface ValuationByCategory {
+  categoryId?: number;
+  categoryName: string;
+  partCount: number;
+  totalQuantity: number;
+  totalValue: number;
+}
+
+export interface ValuationByLocation {
+  locationId?: number;
+  locationName: string;
+  partCount: number;
+  totalQuantity: number;
+  totalValue: number;
+}
+
+export interface InventoryValuationFilter {
+  categoryId?: number;
+  locationId?: number;
+}
+
+export interface StockMovementItem {
+  transactionId: number;
+  partId: number;
+  partNumber: string;
+  partName: string;
+  transactionType: string;
+  quantity: number;
+  fromLocationName?: string;
+  toLocationName?: string;
+  reference?: string;
+  notes?: string;
+  transactionDate: string;
+  performedByName?: string;
+}
+
+export interface StockMovementFilter {
+  fromDate?: string;
+  toDate?: string;
+  partId?: number;
+  transactionType?: string;
+  locationId?: number;
+}
+
+export interface OverdueMaintenanceReport {
+  totalOverdue: number;
+  overduePMCount: number;
+  overdueWorkOrderCount: number;
+  overduePMSchedules: OverduePMSchedule[];
+  overdueWorkOrders: OverdueWorkOrder[];
+}
+
+export interface OverduePMSchedule {
+  scheduleId: number;
+  scheduleName: string;
+  assetId?: number;
+  assetName?: string;
+  dueDate: string;
+  daysOverdue: number;
+  priority: string;
+  frequencyDescription: string;
+}
+
+export interface OverdueWorkOrder {
+  workOrderId: number;
+  workOrderNumber: string;
+  title: string;
+  type: string;
+  priority: string;
+  status: string;
+  assetId?: number;
+  assetName?: string;
+  scheduledEndDate?: string;
+  daysOverdue: number;
+  assignedToName?: string;
+}
+
+export interface MaintenancePerformedReport {
+  totalWorkOrders: number;
+  totalLaborHours: number;
+  totalLaborCost: number;
+  totalPartsCost: number;
+  totalCost: number;
+  items: MaintenancePerformedItem[];
+}
+
+export interface MaintenancePerformedItem {
+  workOrderId: number;
+  workOrderNumber: string;
+  title: string;
+  type: string;
+  assetId?: number;
+  assetName?: string;
+  completedDate?: string;
+  laborHours: number;
+  laborCost: number;
+  partsCost: number;
+  totalCost: number;
+  completedByName?: string;
+}
+
+export interface MaintenancePerformedFilter {
+  fromDate?: string;
+  toDate?: string;
+  assetId?: number;
+  technicianId?: number;
+  workOrderType?: string;
+}
+
+export interface PMComplianceReport {
+  totalScheduled: number;
+  totalCompleted: number;
+  totalMissed: number;
+  complianceRate: number;
+  fromDate?: string;
+  toDate?: string;
+  items: PMComplianceItem[];
+}
+
+export interface PMComplianceItem {
+  scheduleId: number;
+  scheduleName: string;
+  assetId?: number;
+  assetName?: string;
+  frequencyDescription: string;
+  scheduledCount: number;
+  completedCount: number;
+  missedCount: number;
+  complianceRate: number;
+}
+
+export interface PMComplianceFilter {
+  fromDate?: string;
+  toDate?: string;
+  assetId?: number;
+}
+
+export interface WorkOrderSummaryReport {
+  totalWorkOrders: number;
+  fromDate?: string;
+  toDate?: string;
+  byStatus: WorkOrderCountByStatus[];
+  byType: WorkOrderCountByType[];
+  byPriority: WorkOrderCountByPriority[];
+}
+
+export interface WorkOrderCountByStatus {
+  status: string;
+  count: number;
+  percentage: number;
+}
+
+export interface WorkOrderCountByType {
+  type: string;
+  count: number;
+  percentage: number;
+}
+
+export interface WorkOrderCountByPriority {
+  priority: string;
+  count: number;
+  percentage: number;
+}
+
+export interface WorkOrderSummaryFilter {
+  fromDate?: string;
+  toDate?: string;
+}
+
+export interface AssetMaintenanceHistoryReport {
+  assetId: number;
+  assetTag: string;
+  assetName: string;
+  totalWorkOrders: number;
+  totalLaborHours: number;
+  totalCost: number;
+  items: AssetMaintenanceHistoryItem[];
+}
+
+export interface AssetMaintenanceHistoryItem {
+  workOrderId: number;
+  workOrderNumber: string;
+  title: string;
+  type: string;
+  status: string;
+  priority: string;
+  completedDate?: string;
+  laborHours: number;
+  totalCost: number;
+  technicianName?: string;
+}
+
+export interface AssetMaintenanceHistoryFilter {
+  assetId: number;
+  fromDate?: string;
+  toDate?: string;
+}
