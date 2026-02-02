@@ -6,6 +6,6 @@
   2. Frontend (Terminal 2):
   cd C:\Users\aaron\source\claude\demo\frontend
   npm start
-  3. Open http://localhost:3000 and login with admin / Admin@123
+  3. Open http://fragbox:3000 and login with admin / Admin@123
 
   See you tomorrow!

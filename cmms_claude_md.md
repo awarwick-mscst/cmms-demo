@@ -7,7 +7,7 @@ On-premises Computerized Maintenance Management System (CMMS) built for enterpri
 ## Technology Stack
 
 ### Database
-- **PostgreSQL 15+** (Primary choice for robust features, JSON support, and enterprise reliability)
+- **Microsoft SQL Server+** (Primary choice for robust features, JSON support, and enterprise reliability)
 - Reasons: ACID compliance, advanced indexing, partitioning support, free licensing, excellent performance for OLTP workloads
 
 ### Backend
@@ -23,7 +23,6 @@ On-premises Computerized Maintenance Management System (CMMS) built for enterpri
 - React Query for server state management
 
 ### Infrastructure
-- Docker containers for development consistency
 - Nginx reverse proxy
 - Redis for caching and session management
 - Windows Server 2022 or Linux (Ubuntu 22.04 LTS) for production hosting
@@ -281,7 +280,6 @@ On-premises Computerized Maintenance Management System (CMMS) built for enterpri
 - Manual approval for production deployment
 
 ### Environment Configuration
-- Development: Local Docker Compose setup
 - Staging: Mirror production with anonymized data
 - Production: High availability configuration with load balancing
 
@@ -327,14 +325,14 @@ On-premises Computerized Maintenance Management System (CMMS) built for enterpri
 ## Deployment Architecture
 
 ### Production Environment
-- Primary database server (PostgreSQL)
+- Primary database server (Microsoft SQL Server)
 - Application server (ASP.NET Core API)
 - Web server (Nginx serving React frontend)
 - Redis server (caching and sessions)
 - Backup server (automated daily backups with 30-day retention)
 
 ### High Availability Options
-- PostgreSQL streaming replication (primary + standby)
+- Microsoft SQL streaming replication (primary + standby)
 - Load balancer for API servers (if scaling horizontally)
 - Database connection pooling (PgBouncer)
 - Automated failover procedures
@@ -348,28 +346,28 @@ On-premises Computerized Maintenance Management System (CMMS) built for enterpri
 
 ## Initial Development Phases
 
-### Phase 1: Foundation (Weeks 1-4)
+### Phase 1: Foundation (Day 1-2)
 - Database schema design and creation
 - Authentication and authorization system
 - Basic API framework and middleware
 - Frontend project structure and routing
 - Asset management CRUD operations
 
-### Phase 2: Core Features (Weeks 5-10)
+### Phase 2: Core Features (Day 3-8)
 - Work order management system
 - Preventive maintenance scheduling
 - Inventory management
 - User and team management
 - Basic reporting
 
-### Phase 3: Advanced Features (Weeks 11-16)
+### Phase 3: Advanced Features (Day 9 - 14)
 - Dashboard and analytics
 - Mobile responsiveness
 - Email notifications
 - Document management
 - Advanced reporting and exports
 
-### Phase 4: Polish & Deployment (Weeks 17-20)
+### Phase 4: Polish & Deployment (Day 15 - 21)
 - Performance optimization
 - Security hardening
 - User acceptance testing
@@ -380,7 +378,7 @@ On-premises Computerized Maintenance Management System (CMMS) built for enterpri
 
 When working on this project:
 
-1. **Always use PostgreSQL-specific syntax** for database operations
+1. **Always use Microsoft SQL-specific syntax** for database operations
 2. **Follow the established project structure** exactly as defined
 3. **Generate migrations** for all database schema changes using Entity Framework Core
 4. **Implement comprehensive error handling** for all operations

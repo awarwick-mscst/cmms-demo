@@ -2,7 +2,8 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { store } from '../store';
 import { logout, setTokens } from '../store/authSlice';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://fragbox:5000/api/v1';
+
 
 const api = axios.create({
   baseURL: API_BASE_URL,

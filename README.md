@@ -58,7 +58,7 @@ A full-stack maintenance management system built with ASP.NET Core 8.0, React 18
    dotnet run
    ```
 
-   The API will be available at `https://localhost:5001` (or `http://localhost:5000`)
+   The API will be available at `https://fragbox:5001` (or `http://fragbox:5000`)
 
 ### 3. Frontend Setup
 
@@ -70,7 +70,7 @@ A full-stack maintenance management system built with ASP.NET Core 8.0, React 18
 
 2. Create `.env` file:
    ```
-   REACT_APP_API_URL=http://localhost:5000/api/v1
+   REACT_APP_API_URL=http://fragbox:5000/api/v1
    ```
 
 3. Start the development server:
@@ -78,7 +78,7 @@ A full-stack maintenance management system built with ASP.NET Core 8.0, React 18
    npm start
    ```
 
-   The app will be available at `http://localhost:3000`
+   The app will be available at `http://fragbox:3000`
 
 ## Default Login
 
