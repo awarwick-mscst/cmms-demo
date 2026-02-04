@@ -41,7 +41,7 @@ export const LoginPage: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'grey.100',
+        bgcolor: 'background.default',
       }}
     >
       <Card sx={{ maxWidth: 400, width: '100%', mx: 2 }}>

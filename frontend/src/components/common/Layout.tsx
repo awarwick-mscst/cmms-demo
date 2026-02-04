@@ -42,10 +42,13 @@ import {
   Print as PrintIcon,
   Label as LabelIcon,
   Assessment as ReportsIcon,
+  Brightness4 as Brightness4Icon,
+  Brightness7 as Brightness7Icon,
 } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
+import { useThemeMode } from '../../hooks/useThemeMode';
 import { workOrderService } from '../../services/workOrderService';
 
 const drawerWidth = 240;
@@ -99,6 +102,7 @@ export const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { resolvedMode, toggleMode } = useThemeMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
@@ -258,6 +262,9 @@ export const Layout: React.FC = () => {
               }}
             />
           )}
+          <IconButton color="inherit" onClick={toggleMode} sx={{ mr: 1 }}>
+            {resolvedMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
               {user?.firstName?.[0] || 'U'}

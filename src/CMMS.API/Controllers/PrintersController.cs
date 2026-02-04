@@ -55,6 +55,14 @@ public class PrintersController : ControllerBase
         return Ok(ApiResponse<LabelPrinterDto>.Ok(MapToDto(printer)));
     }
 
+    [HttpGet("windows-printers")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<string>>>> GetWindowsPrinters(
+        CancellationToken cancellationToken = default)
+    {
+        var printers = await _printService.GetWindowsPrintersAsync(cancellationToken);
+        return Ok(ApiResponse<IEnumerable<string>>.Ok(printers));
+    }
+
     [HttpPost]
     [Authorize(Policy = "CanManageLabels")]
     public async Task<ActionResult<ApiResponse<LabelPrinterDto>>> CreatePrinter(
@@ -64,9 +72,12 @@ public class PrintersController : ControllerBase
         var printer = new LabelPrinter
         {
             Name = request.Name,
+            ConnectionType = ParseConnectionType(request.ConnectionType),
             IpAddress = request.IpAddress,
             Port = request.Port,
+            WindowsPrinterName = request.WindowsPrinterName,
             PrinterModel = request.PrinterModel,
+            Language = ParseLanguage(request.Language),
             Dpi = request.Dpi,
             IsActive = request.IsActive,
             IsDefault = request.IsDefault,
@@ -93,9 +104,12 @@ public class PrintersController : ControllerBase
             return NotFound(ApiResponse<LabelPrinterDto>.Fail("Printer not found"));
 
         printer.Name = request.Name;
+        printer.ConnectionType = ParseConnectionType(request.ConnectionType);
         printer.IpAddress = request.IpAddress;
         printer.Port = request.Port;
+        printer.WindowsPrinterName = request.WindowsPrinterName;
         printer.PrinterModel = request.PrinterModel;
+        printer.Language = ParseLanguage(request.Language);
         printer.Dpi = request.Dpi;
         printer.IsActive = request.IsActive;
         printer.IsDefault = request.IsDefault;
@@ -132,12 +146,16 @@ public class PrintersController : ControllerBase
 
         var success = await _printService.TestPrinterConnectionAsync(printer, cancellationToken);
 
+        var connectionInfo = printer.ConnectionType == PrinterConnectionType.WindowsPrinter
+            ? printer.WindowsPrinterName
+            : $"{printer.IpAddress}:{printer.Port}";
+
         var result = new PrinterTestResultDto
         {
             Success = success,
             Message = success
-                ? $"Successfully connected to {printer.Name} at {printer.IpAddress}:{printer.Port}"
-                : $"Failed to connect to {printer.Name} at {printer.IpAddress}:{printer.Port}"
+                ? $"Successfully connected to {printer.Name} ({connectionInfo})"
+                : $"Failed to connect to {printer.Name} ({connectionInfo})"
         };
 
         return Ok(ApiResponse<PrinterTestResultDto>.Ok(result));
@@ -157,21 +175,65 @@ public class PrintersController : ControllerBase
         return Ok(ApiResponse.Ok("Default printer set successfully"));
     }
 
+    [HttpPost("{id}/test-print")]
+    [Authorize(Policy = "CanManageLabels")]
+    public async Task<ActionResult<ApiResponse<PrinterTestResultDto>>> TestPrintLabel(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var printer = await _labelService.GetPrinterByIdAsync(id, cancellationToken);
+        if (printer == null)
+            return NotFound(ApiResponse<PrinterTestResultDto>.Fail("Printer not found"));
+
+        var success = await _printService.PrintTestLabelAsync(printer, cancellationToken);
+
+        var result = new PrinterTestResultDto
+        {
+            Success = success,
+            Message = success
+                ? $"Test label sent to {printer.Name}. Check printer for output."
+                : $"Failed to send test label to {printer.Name}. Check logs for details."
+        };
+
+        return Ok(ApiResponse<PrinterTestResultDto>.Ok(result));
+    }
+
     private static LabelPrinterDto MapToDto(LabelPrinter printer)
     {
         return new LabelPrinterDto
         {
             Id = printer.Id,
             Name = printer.Name,
+            ConnectionType = printer.ConnectionType.ToString(),
             IpAddress = printer.IpAddress,
             Port = printer.Port,
+            WindowsPrinterName = printer.WindowsPrinterName,
             PrinterModel = printer.PrinterModel,
+            Language = printer.Language.ToString(),
             Dpi = printer.Dpi,
             IsActive = printer.IsActive,
             IsDefault = printer.IsDefault,
             Location = printer.Location,
             CreatedAt = printer.CreatedAt,
             UpdatedAt = printer.UpdatedAt
+        };
+    }
+
+    private static PrinterConnectionType ParseConnectionType(string connectionType)
+    {
+        return connectionType?.ToLower() switch
+        {
+            "windowsprinter" => PrinterConnectionType.WindowsPrinter,
+            _ => PrinterConnectionType.Network
+        };
+    }
+
+    private static PrinterLanguage ParseLanguage(string language)
+    {
+        return language?.ToUpper() switch
+        {
+            "EPL" => PrinterLanguage.EPL,
+            _ => PrinterLanguage.ZPL
         };
     }
 }

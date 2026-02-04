@@ -1,3 +1,4 @@
+using CMMS.Core.Entities;
 using CMMS.Core.Interfaces;
 using CMMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -93,12 +94,24 @@ public class PrintController : ControllerBase
         if (template == null)
             return BadRequest(ApiResponse<PrintPreviewResponse>.Fail("Label template not found or no default template configured"));
 
-        // Generate ZPL preview
-        var zpl = await _printService.GenerateZplAsync(part, template, cancellationToken);
+        // Determine language from printer if specified, otherwise default to ZPL
+        var language = PrinterLanguage.ZPL;
+        if (request.PrinterId.HasValue)
+        {
+            var printer = await _labelService.GetPrinterByIdAsync(request.PrinterId.Value, cancellationToken);
+            if (printer != null)
+            {
+                language = printer.Language;
+            }
+        }
+
+        // Generate label commands preview
+        var commands = await _printService.GenerateLabelCommandsAsync(part, template, language, cancellationToken);
 
         var response = new PrintPreviewResponse
         {
-            Zpl = zpl,
+            Zpl = commands,  // Field name kept for backward compatibility
+            Language = language.ToString(),
             TemplateName = template.Name,
             Width = template.Width,
             Height = template.Height

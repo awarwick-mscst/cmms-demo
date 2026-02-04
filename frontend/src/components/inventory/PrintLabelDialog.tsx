@@ -51,11 +51,12 @@ export const PrintLabelDialog: React.FC<PrintLabelDialogProps> = ({
   });
 
   const { data: preview, isLoading: loadingPreview } = useQuery({
-    queryKey: ['print-preview', partId, templateId],
+    queryKey: ['print-preview', partId, templateId, printerId],
     queryFn: () =>
       labelService.getPreview({
         partId,
         templateId: templateId || undefined,
+        printerId: printerId || undefined,
       }),
     enabled: open && showPreview && !!partId,
   });
@@ -208,7 +209,7 @@ export const PrintLabelDialog: React.FC<PrintLabelDialogProps> = ({
                   onClick={() => setShowPreview(!showPreview)}
                   sx={{ height: '100%' }}
                 >
-                  {showPreview ? 'Hide Preview' : 'Show ZPL Preview'}
+                  {showPreview ? 'Hide Preview' : 'Show Commands Preview'}
                 </Button>
               </Grid>
             </Grid>
@@ -225,7 +226,7 @@ export const PrintLabelDialog: React.FC<PrintLabelDialogProps> = ({
                 }}
               >
                 <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mb: 1 }}>
-                  ZPL Preview:
+                  {preview?.data?.language || 'ZPL'} Preview:
                 </Typography>
                 {loadingPreview ? (
                   <CircularProgress size={20} />

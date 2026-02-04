@@ -59,6 +59,11 @@ export const labelService = {
     return response.data;
   },
 
+  getWindowsPrinters: async (): Promise<ApiResponse<string[]>> => {
+    const response = await api.get<ApiResponse<string[]>>('/printers/windows-printers');
+    return response.data;
+  },
+
   getPrinter: async (id: number): Promise<ApiResponse<LabelPrinter>> => {
     const response = await api.get<ApiResponse<LabelPrinter>>(`/printers/${id}`);
     return response.data;
@@ -86,6 +91,11 @@ export const labelService = {
 
   testPrinter: async (id: number): Promise<ApiResponse<PrinterTestResult>> => {
     const response = await api.post<ApiResponse<PrinterTestResult>>(`/printers/${id}/test`);
+    return response.data;
+  },
+
+  testPrintLabel: async (id: number): Promise<ApiResponse<PrinterTestResult>> => {
+    const response = await api.post<ApiResponse<PrinterTestResult>>(`/printers/${id}/test-print`);
     return response.data;
   },
 

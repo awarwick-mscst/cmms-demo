@@ -80,7 +80,8 @@ public class ZplGenerator
         sb.Append($"^FO{element.X},{element.Y}");
 
         // Bar code module width (1-10, higher = thicker bars)
-        sb.Append("^BY2");
+        var moduleWidth = element.BarcodeWidth ?? 2;
+        sb.Append($"^BY{moduleWidth}");
 
         // Code 128 barcode
         // ^BC = Code 128, orientation, height, interpretation line, interpretation above, UCC check digit
@@ -146,5 +147,6 @@ public class LabelElement
     public int? FontSize { get; set; }
     public int? Height { get; set; }
     public int MaxWidth { get; set; }
+    public int? BarcodeWidth { get; set; }  // Module/bar width for barcodes (1-5 dots)
     public string? Format { get; set; }
 }

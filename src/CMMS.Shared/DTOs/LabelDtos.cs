@@ -42,13 +42,21 @@ public class LabelPrinterDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
+
+    // Connection settings
+    public string ConnectionType { get; set; } = "Network";  // "Network" or "WindowsPrinter"
     public string IpAddress { get; set; } = string.Empty;
     public int Port { get; set; }
+    public string? WindowsPrinterName { get; set; }
+
+    // Printer settings
     public string? PrinterModel { get; set; }
+    public string Language { get; set; } = "ZPL";  // "ZPL" or "EPL"
     public int Dpi { get; set; }
     public bool IsActive { get; set; }
     public bool IsDefault { get; set; }
     public string? Location { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -56,9 +64,16 @@ public class LabelPrinterDto
 public class CreateLabelPrinterRequest
 {
     public string Name { get; set; } = string.Empty;
+
+    // Connection settings
+    public string ConnectionType { get; set; } = "Network";
     public string IpAddress { get; set; } = string.Empty;
     public int Port { get; set; } = 9100;
+    public string? WindowsPrinterName { get; set; }
+
+    // Printer settings
     public string? PrinterModel { get; set; }
+    public string Language { get; set; } = "ZPL";
     public int Dpi { get; set; } = 203;
     public bool IsActive { get; set; } = true;
     public bool IsDefault { get; set; }
@@ -68,9 +83,16 @@ public class CreateLabelPrinterRequest
 public class UpdateLabelPrinterRequest
 {
     public string Name { get; set; } = string.Empty;
+
+    // Connection settings
+    public string ConnectionType { get; set; } = "Network";
     public string IpAddress { get; set; } = string.Empty;
     public int Port { get; set; }
+    public string? WindowsPrinterName { get; set; }
+
+    // Printer settings
     public string? PrinterModel { get; set; }
+    public string Language { get; set; } = "ZPL";
     public int Dpi { get; set; }
     public bool IsActive { get; set; }
     public bool IsDefault { get; set; }
@@ -90,11 +112,13 @@ public class PrintPreviewRequest
 {
     public int PartId { get; set; }
     public int? TemplateId { get; set; }
+    public int? PrinterId { get; set; }  // Used to determine language (EPL/ZPL)
 }
 
 public class PrintPreviewResponse
 {
-    public string Zpl { get; set; } = string.Empty;
+    public string Zpl { get; set; } = string.Empty;  // Contains EPL or ZPL commands
+    public string Language { get; set; } = "ZPL";    // "ZPL" or "EPL"
     public string TemplateName { get; set; } = string.Empty;
     public decimal Width { get; set; }
     public decimal Height { get; set; }
@@ -124,5 +148,6 @@ public class LabelElementDto
     public int? FontSize { get; set; }
     public int? Height { get; set; }
     public int MaxWidth { get; set; }
+    public int? BarcodeWidth { get; set; }  // Module/bar width for barcodes (1-5 dots)
     public string? Format { get; set; }
 }

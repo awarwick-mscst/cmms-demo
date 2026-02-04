@@ -1,3 +1,6 @@
+// Theme Types
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export interface User {
   id: number;
   username: string;
@@ -759,12 +762,18 @@ export interface UpdateLabelTemplateRequest {
   isDefault: boolean;
 }
 
+export type PrinterConnectionType = 'Network' | 'WindowsPrinter';
+export type PrinterLanguage = 'ZPL' | 'EPL';
+
 export interface LabelPrinter {
   id: number;
   name: string;
+  connectionType: PrinterConnectionType;
   ipAddress: string;
   port: number;
+  windowsPrinterName?: string;
   printerModel?: string;
+  language: PrinterLanguage;
   dpi: number;
   isActive: boolean;
   isDefault: boolean;
@@ -775,9 +784,12 @@ export interface LabelPrinter {
 
 export interface CreateLabelPrinterRequest {
   name: string;
-  ipAddress: string;
+  connectionType?: PrinterConnectionType;
+  ipAddress?: string;
   port?: number;
+  windowsPrinterName?: string;
   printerModel?: string;
+  language?: PrinterLanguage;
   dpi?: number;
   isActive?: boolean;
   isDefault?: boolean;
@@ -786,9 +798,12 @@ export interface CreateLabelPrinterRequest {
 
 export interface UpdateLabelPrinterRequest {
   name: string;
+  connectionType: PrinterConnectionType;
   ipAddress: string;
   port: number;
+  windowsPrinterName?: string;
   printerModel?: string;
+  language: PrinterLanguage;
   dpi: number;
   isActive: boolean;
   isDefault: boolean;
@@ -805,10 +820,12 @@ export interface PrintLabelRequest {
 export interface PrintPreviewRequest {
   partId: number;
   templateId?: number;
+  printerId?: number;
 }
 
 export interface PrintPreviewResponse {
-  zpl: string;
+  zpl: string;  // Contains EPL or ZPL commands
+  language: PrinterLanguage;
   templateName: string;
   width: number;
   height: number;
@@ -834,6 +851,7 @@ export interface LabelElement {
   fontSize?: number;
   height?: number;
   maxWidth?: number;
+  barcodeWidth?: number;  // Module/bar width for barcodes (1-5 dots)
   format?: string;
 }
 

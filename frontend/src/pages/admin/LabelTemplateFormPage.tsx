@@ -10,25 +10,36 @@ import {
   Alert,
   MenuItem,
   IconButton,
-  Card,
-  CardContent,
   FormControlLabel,
   Switch,
+  Tabs,
+  Tab,
   Divider,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
   ArrowBack as ArrowBackIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { labelService } from '../../services/labelService';
 import {
   LabelElement,
   CreateLabelTemplateRequest,
-  LabelFieldOptions,
   DpiOptions,
 } from '../../types';
+import { LabelDesigner } from '../../components/admin/LabelDesigner';
+
+// Common label sizes in inches
+const LABEL_PRESETS = [
+  { name: 'Custom', width: 0, height: 0 },
+  { name: '2" x 1" (Standard)', width: 2.0, height: 1.0 },
+  { name: '2.25" x 1.25"', width: 2.25, height: 1.25 },
+  { name: '2" x 0.5" (Small)', width: 2.0, height: 0.5 },
+  { name: '3" x 1"', width: 3.0, height: 1.0 },
+  { name: '3" x 2"', width: 3.0, height: 2.0 },
+  { name: '4" x 2"', width: 4.0, height: 2.0 },
+  { name: '4" x 6" (Shipping)', width: 4.0, height: 6.0 },
+];
 
 export const LabelTemplateFormPage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +47,8 @@ export const LabelTemplateFormPage: React.FC = () => {
   const queryClient = useQueryClient();
   const isEdit = id && id !== 'new';
 
+  const [activeTab, setActiveTab] = useState(0);
+  const [selectedPreset, setSelectedPreset] = useState('Custom');
   const [formData, setFormData] = useState<CreateLabelTemplateRequest>({
     name: '',
     description: '',
@@ -47,7 +60,6 @@ export const LabelTemplateFormPage: React.FC = () => {
   });
 
   const [elements, setElements] = useState<LabelElement[]>([]);
-  const [previewZpl, setPreviewZpl] = useState<string>('');
 
   const { data: template, isLoading } = useQuery({
     queryKey: ['label-template', id],
@@ -72,6 +84,12 @@ export const LabelTemplateFormPage: React.FC = () => {
       } catch {
         setElements([]);
       }
+
+      // Check if matches a preset
+      const preset = LABEL_PRESETS.find(
+        p => p.width === template.data!.width && p.height === template.data!.height
+      );
+      setSelectedPreset(preset?.name || 'Custom');
     }
   }, [template]);
 
@@ -109,35 +127,26 @@ export const LabelTemplateFormPage: React.FC = () => {
     }
   };
 
-  const handleAddElement = (type: 'text' | 'barcode') => {
-    const newElement: LabelElement = {
-      type,
-      field: 'partNumber',
-      x: 10,
-      y: (elements.length + 1) * 30,
-      ...(type === 'text' ? { fontSize: 25, maxWidth: 180 } : { height: 50 }),
-    };
-    setElements([...elements, newElement]);
+  const handlePresetChange = (presetName: string) => {
+    setSelectedPreset(presetName);
+    const preset = LABEL_PRESETS.find(p => p.name === presetName);
+    if (preset && preset.width > 0) {
+      setFormData(prev => ({
+        ...prev,
+        width: preset.width,
+        height: preset.height,
+      }));
+    }
   };
 
-  const handleUpdateElement = (index: number, updates: Partial<LabelElement>) => {
-    const newElements = [...elements];
-    newElements[index] = { ...newElements[index], ...updates };
-    setElements(newElements);
-  };
-
-  const handleRemoveElement = (index: number) => {
-    setElements(elements.filter((_, i) => i !== index));
-  };
-
-  const handleMoveElement = (index: number, direction: 'up' | 'down') => {
-    if (direction === 'up' && index === 0) return;
-    if (direction === 'down' && index === elements.length - 1) return;
-
-    const newElements = [...elements];
-    const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    [newElements[index], newElements[swapIndex]] = [newElements[swapIndex], newElements[index]];
-    setElements(newElements);
+  const handleDimensionChange = (dimension: 'width' | 'height', value: number) => {
+    setFormData(prev => ({ ...prev, [dimension]: value }));
+    // Check if it now matches a preset
+    const newDimensions = { ...formData, [dimension]: value };
+    const preset = LABEL_PRESETS.find(
+      p => p.width === newDimensions.width && p.height === newDimensions.height
+    );
+    setSelectedPreset(preset?.name || 'Custom');
   };
 
   const error = createMutation.error || updateMutation.error;
@@ -148,14 +157,23 @@ export const LabelTemplateFormPage: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+    <Box sx={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <IconButton onClick={() => navigate('/admin/label-templates')} sx={{ mr: 2 }}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5">
+        <Typography variant="h5" sx={{ flex: 1 }}>
           {isEdit ? 'Edit Label Template' : 'New Label Template'}
         </Typography>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon />}
+          onClick={handleSubmit}
+          disabled={isSubmitting || !formData.name || elements.length === 0}
+        >
+          {isSubmitting ? 'Saving...' : 'Save Template'}
+        </Button>
       </Box>
 
       {error && (
@@ -164,239 +182,141 @@ export const LabelTemplateFormPage: React.FC = () => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Template Settings
-            </Typography>
+      {/* Tabs */}
+      <Paper sx={{ mb: 2 }}>
+        <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)}>
+          <Tab label="Design" />
+          <Tab label="Settings" />
+        </Tabs>
+      </Paper>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Template Name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  label="Description"
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  label="Width (inches)"
-                  type="number"
-                  inputProps={{ step: 0.25, min: 0.5, max: 8 }}
-                  value={formData.width}
-                  onChange={(e) =>
-                    setFormData({ ...formData, width: parseFloat(e.target.value) || 2.0 })
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  label="Height (inches)"
-                  type="number"
-                  inputProps={{ step: 0.25, min: 0.25, max: 8 }}
-                  value={formData.height}
-                  onChange={(e) =>
-                    setFormData({ ...formData, height: parseFloat(e.target.value) || 1.0 })
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  select
-                  label="DPI"
-                  value={formData.dpi}
-                  onChange={(e) => setFormData({ ...formData, dpi: parseInt(e.target.value) })}
-                >
-                  {DpiOptions.map((dpi) => (
-                    <MenuItem key={dpi} value={dpi}>
-                      {dpi} DPI
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isDefault ?? false}
-                      onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                    />
-                  }
-                  label="Set as default template"
-                />
-              </Grid>
+      {/* Design Tab */}
+      {activeTab === 0 && (
+        <Box sx={{ flex: 1, minHeight: 0 }}>
+          <LabelDesigner
+            width={formData.width || 2.0}
+            height={formData.height || 1.0}
+            dpi={formData.dpi || 203}
+            elements={elements}
+            onElementsChange={setElements}
+          />
+        </Box>
+      )}
+
+      {/* Settings Tab */}
+      {activeTab === 1 && (
+        <Paper sx={{ p: 3, maxWidth: 600 }}>
+          <Typography variant="h6" sx={{ mb: 3 }}>
+            Template Settings
+          </Typography>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Template Name"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g., Small Part Label"
+              />
             </Grid>
-          </Paper>
-        </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Label Elements</Typography>
-              <Box>
-                <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={() => handleAddElement('text')}
-                  sx={{ mr: 1 }}
-                >
-                  Add Text
-                </Button>
-                <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={() => handleAddElement('barcode')}
-                >
-                  Add Barcode
-                </Button>
-              </Box>
-            </Box>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                label="Description"
+                value={formData.description || ''}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Describe when to use this template"
+              />
+            </Grid>
 
-            {elements.length === 0 ? (
-              <Typography color="textSecondary" sx={{ py: 4, textAlign: 'center' }}>
-                No elements. Add text or barcode elements above.
+            <Grid item xs={12}>
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                Label Size
               </Typography>
-            ) : (
-              <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
-                {elements.map((element, index) => (
-                  <Card key={index} variant="outlined" sx={{ mb: 2 }}>
-                    <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="subtitle2" color="primary">
-                          {element.type === 'text' ? 'Text Element' : 'Barcode Element'}
-                        </Typography>
-                        <IconButton size="small" onClick={() => handleRemoveElement(index)} color="error">
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
+            </Grid>
 
-                      <Grid container spacing={1}>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            select
-                            label="Field"
-                            value={element.field}
-                            onChange={(e) =>
-                              handleUpdateElement(index, { field: e.target.value })
-                            }
-                          >
-                            {LabelFieldOptions.map((option) => (
-                              <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="X (dots)"
-                            type="number"
-                            value={element.x}
-                            onChange={(e) =>
-                              handleUpdateElement(index, { x: parseInt(e.target.value) || 0 })
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Y (dots)"
-                            type="number"
-                            value={element.y}
-                            onChange={(e) =>
-                              handleUpdateElement(index, { y: parseInt(e.target.value) || 0 })
-                            }
-                          />
-                        </Grid>
-                        {element.type === 'text' && (
-                          <>
-                            <Grid item xs={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Font Size"
-                                type="number"
-                                value={element.fontSize || 25}
-                                onChange={(e) =>
-                                  handleUpdateElement(index, {
-                                    fontSize: parseInt(e.target.value) || 25,
-                                  })
-                                }
-                              />
-                            </Grid>
-                            <Grid item xs={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Max Width"
-                                type="number"
-                                value={element.maxWidth || 0}
-                                onChange={(e) =>
-                                  handleUpdateElement(index, {
-                                    maxWidth: parseInt(e.target.value) || 0,
-                                  })
-                                }
-                              />
-                            </Grid>
-                          </>
-                        )}
-                        {element.type === 'barcode' && (
-                          <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              label="Height (dots)"
-                              type="number"
-                              value={element.height || 50}
-                              onChange={(e) =>
-                                handleUpdateElement(index, {
-                                  height: parseInt(e.target.value) || 50,
-                                })
-                              }
-                            />
-                          </Grid>
-                        )}
-                      </Grid>
-                    </CardContent>
-                  </Card>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                select
+                label="Label Size Preset"
+                value={selectedPreset}
+                onChange={(e) => handlePresetChange(e.target.value)}
+              >
+                {LABEL_PRESETS.map((preset) => (
+                  <MenuItem key={preset.name} value={preset.name}>
+                    {preset.name}
+                  </MenuItem>
                 ))}
-              </Box>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
+              </TextField>
+            </Grid>
 
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-        <Button onClick={() => navigate('/admin/label-templates')}>Cancel</Button>
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={isSubmitting || !formData.name || elements.length === 0}
-        >
-          {isSubmitting ? 'Saving...' : 'Save Template'}
-        </Button>
-      </Box>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Width (inches)"
+                type="number"
+                inputProps={{ step: 0.25, min: 0.5, max: 8 }}
+                value={formData.width}
+                onChange={(e) => handleDimensionChange('width', parseFloat(e.target.value) || 2.0)}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Height (inches)"
+                type="number"
+                inputProps={{ step: 0.25, min: 0.25, max: 8 }}
+                value={formData.height}
+                onChange={(e) => handleDimensionChange('height', parseFloat(e.target.value) || 1.0)}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                select
+                label="Printer DPI"
+                value={formData.dpi}
+                onChange={(e) => setFormData({ ...formData, dpi: parseInt(e.target.value) })}
+                helperText="Match your printer's DPI"
+              >
+                {DpiOptions.map((dpi) => (
+                  <MenuItem key={dpi} value={dpi}>
+                    {dpi} DPI
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider sx={{ my: 1 }} />
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isDefault ?? false}
+                    onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                  />
+                }
+                label="Set as default template"
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4 }}>
+                The default template is used when no template is specified
+              </Typography>
+            </Grid>
+          </Grid>
+        </Paper>
+      )}
     </Box>
   );
 };

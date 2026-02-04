@@ -18,18 +18,35 @@ public class LabelPrinterConfiguration : IEntityTypeConfiguration<LabelPrinter>
             .HasMaxLength(100)
             .IsRequired();
 
+        // Connection settings
+        builder.Property(p => p.ConnectionType)
+            .HasColumnName("connection_type")
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(PrinterConnectionType.Network);
+
         builder.Property(p => p.IpAddress)
             .HasColumnName("ip_address")
-            .HasMaxLength(50)
-            .IsRequired();
+            .HasMaxLength(50);
 
         builder.Property(p => p.Port)
             .HasColumnName("port")
             .HasDefaultValue(9100);
 
+        builder.Property(p => p.WindowsPrinterName)
+            .HasColumnName("windows_printer_name")
+            .HasMaxLength(200);
+
+        // Printer settings
         builder.Property(p => p.PrinterModel)
             .HasColumnName("printer_model")
             .HasMaxLength(100);
+
+        builder.Property(p => p.Language)
+            .HasColumnName("language")
+            .HasConversion<string>()
+            .HasMaxLength(10)
+            .HasDefaultValue(PrinterLanguage.ZPL);
 
         builder.Property(p => p.Dpi)
             .HasColumnName("dpi")

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,6 +6,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { store } from './store';
+import { ThemeContextProvider } from './contexts/ThemeContext';
+import { useThemeMode } from './hooks/useThemeMode';
 import { Layout } from './components/common/Layout';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
@@ -56,30 +58,37 @@ const queryClient = new QueryClient({
   },
 });
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
+const getTheme = (mode: 'light' | 'dark') =>
+  createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: '#1976d2',
+      },
+      secondary: {
+        main: '#dc004e',
+      },
+      ...(mode === 'light'
+        ? {
+            background: {
+              default: '#f5f5f5',
+            },
+          }
+        : {}),
     },
-    secondary: {
-      main: '#dc004e',
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  },
-});
+  });
 
-const App: React.FC = () => {
+const ThemedApp: React.FC = () => {
+  const { resolvedMode } = useThemeMode();
+  const theme = useMemo(() => getTheme(resolvedMode), [resolvedMode]);
+
   return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route
@@ -141,7 +150,17 @@ const App: React.FC = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
-        </ThemeProvider>
+    </ThemeProvider>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeContextProvider>
+          <ThemedApp />
+        </ThemeContextProvider>
       </QueryClientProvider>
     </Provider>
   );
