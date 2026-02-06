@@ -49,6 +49,7 @@ import { assetService } from '../../services/assetService';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../hooks/useAuth';
 import { LaborTypes } from '../../types';
+import { WorkOrderTaskList } from '../../components/workorder/WorkOrderTaskList';
 
 const statusColors: Record<string, 'success' | 'warning' | 'error' | 'default' | 'info' | 'primary'> = {
   Draft: 'default',
@@ -530,6 +531,7 @@ export const WorkOrderDetailPage: React.FC = () => {
 
           <Paper sx={{ mt: 3 }}>
             <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
+              <Tab label="Tasks" />
               <Tab label="Comments" />
               <Tab label="Labor" />
               <Tab label="Parts" />
@@ -537,6 +539,15 @@ export const WorkOrderDetailPage: React.FC = () => {
             </Tabs>
 
             <TabPanel value={tabValue} index={0}>
+              <Box sx={{ px: 2 }}>
+                <WorkOrderTaskList
+                  workOrderId={Number(id)}
+                  disabled={workOrder.status === 'Completed' || workOrder.status === 'Cancelled'}
+                />
+              </Box>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={1}>
               <Box sx={{ px: 2 }}>
                 {canEdit && (
                   <Button startIcon={<AddIcon />} onClick={() => setCommentDialog(true)} sx={{ mb: 2 }}>
@@ -575,7 +586,7 @@ export const WorkOrderDetailPage: React.FC = () => {
               </Box>
             </TabPanel>
 
-            <TabPanel value={tabValue} index={1}>
+            <TabPanel value={tabValue} index={2}>
               <Box sx={{ px: 2 }}>
                 {canEdit && isWorkOrderActive && (
                   <Button startIcon={<AddIcon />} onClick={() => { resetLaborForm(); setLaborDialog(true); }} sx={{ mb: 2 }}>
@@ -619,7 +630,7 @@ export const WorkOrderDetailPage: React.FC = () => {
               </Box>
             </TabPanel>
 
-            <TabPanel value={tabValue} index={2}>
+            <TabPanel value={tabValue} index={3}>
               <Box sx={{ px: 2 }}>
                 {canEdit && isWorkOrderActive && workOrder.assetId && (
                   <Button startIcon={<AddIcon />} onClick={() => { resetPartsForm(); setPartsDialog(true); }} sx={{ mb: 2 }}>
@@ -655,7 +666,7 @@ export const WorkOrderDetailPage: React.FC = () => {
               </Box>
             </TabPanel>
 
-            <TabPanel value={tabValue} index={3}>
+            <TabPanel value={tabValue} index={4}>
               <Box sx={{ px: 2 }}>
                 <List>
                   {historyData?.data?.map((history) => (

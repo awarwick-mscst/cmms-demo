@@ -108,6 +108,29 @@ export const WorkOrdersPage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          <IconButton size="small" onClick={() => navigate(`/maintenance/work-orders/${params.row.id}`)}>
+            <ViewIcon fontSize="small" />
+          </IconButton>
+          {hasPermission('work-orders.edit') && (
+            <IconButton size="small" onClick={() => navigate(`/maintenance/work-orders/${params.row.id}/edit`)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+          {hasPermission('work-orders.delete') && (
+            <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+      ),
+    },
     { field: 'workOrderNumber', headerName: 'WO #', width: 150 },
     { field: 'title', headerName: 'Title', width: 250, flex: 1 },
     {
@@ -150,35 +173,12 @@ export const WorkOrdersPage: React.FC = () => {
       valueFormatter: (params: any) =>
         params.value ? new Date(params.value).toLocaleDateString() : '-',
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          <IconButton size="small" onClick={() => navigate(`/maintenance/work-orders/${params.row.id}`)}>
-            <ViewIcon fontSize="small" />
-          </IconButton>
-          {hasPermission('work-orders.edit') && (
-            <IconButton size="small" onClick={() => navigate(`/maintenance/work-orders/${params.row.id}/edit`)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          )}
-          {hasPermission('work-orders.delete') && (
-            <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          )}
-        </Box>
-      ),
-    },
   ];
 
   const dashboardData = dashboard?.data;
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Work Orders</Typography>
         {hasPermission('work-orders.create') && (
@@ -340,7 +340,7 @@ export const WorkOrdersPage: React.FC = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ height: 600 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.items || []}
           columns={columns}
@@ -354,6 +354,8 @@ export const WorkOrdersPage: React.FC = () => {
           onPaginationModelChange={handlePaginationChange}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => navigate(`/maintenance/work-orders/${params.row.id}`)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
     </Box>

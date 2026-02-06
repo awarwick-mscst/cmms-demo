@@ -23,6 +23,8 @@ public class PreventiveMaintenanceScheduleDto
     public string Priority { get; set; } = string.Empty;
     public decimal? EstimatedHours { get; set; }
     public bool IsActive { get; set; }
+    public int? TaskTemplateId { get; set; }
+    public string? TaskTemplateName { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -62,6 +64,7 @@ public class CreatePreventiveMaintenanceScheduleRequest
     public string Priority { get; set; } = "Medium";
     public decimal? EstimatedHours { get; set; }
     public bool IsActive { get; set; } = true;
+    public int? TaskTemplateId { get; set; }
 }
 
 /// <summary>
@@ -83,4 +86,5 @@ public class UpdatePreventiveMaintenanceScheduleRequest
     public string Priority { get; set; } = "Medium";
     public decimal? EstimatedHours { get; set; }
     public bool IsActive { get; set; } = true;
+    public int? TaskTemplateId { get; set; }
 }

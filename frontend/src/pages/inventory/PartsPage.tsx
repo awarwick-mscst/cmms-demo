@@ -111,6 +111,29 @@ export const PartsPage: React.FC = () => {
   const flatCategories = flattenCategories(categoriesData?.data || []);
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          <IconButton size="small" onClick={() => navigate(`/inventory/parts/${params.row.id}`)}>
+            <ViewIcon fontSize="small" />
+          </IconButton>
+          {hasPermission('inventory.manage') && (
+            <>
+              <IconButton size="small" onClick={() => navigate(`/inventory/parts/${params.row.id}/edit`)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </>
+          )}
+        </Box>
+      ),
+    },
     { field: 'partNumber', headerName: 'Part #', width: 130 },
     { field: 'name', headerName: 'Name', width: 200, flex: 1 },
     { field: 'categoryName', headerName: 'Category', width: 150 },
@@ -160,33 +183,10 @@ export const PartsPage: React.FC = () => {
         </Box>
       ),
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          <IconButton size="small" onClick={() => navigate(`/inventory/parts/${params.row.id}`)}>
-            <ViewIcon fontSize="small" />
-          </IconButton>
-          {hasPermission('inventory.manage') && (
-            <>
-              <IconButton size="small" onClick={() => navigate(`/inventory/parts/${params.row.id}/edit`)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
-          )}
-        </Box>
-      ),
-    },
   ];
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Parts Inventory</Typography>
         {hasPermission('inventory.manage') && (
@@ -281,7 +281,7 @@ export const PartsPage: React.FC = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ height: 600 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.items || []}
           columns={columns}
@@ -295,6 +295,8 @@ export const PartsPage: React.FC = () => {
           onPaginationModelChange={handlePaginationChange}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => navigate(`/inventory/parts/${params.row.id}`)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
     </Box>

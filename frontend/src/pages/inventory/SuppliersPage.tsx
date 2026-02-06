@@ -132,6 +132,26 @@ export const SuppliersPage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          {hasPermission('inventory.manage') && (
+            <>
+              <IconButton size="small" onClick={() => handleOpenEdit(params.row)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </>
+          )}
+        </Box>
+      ),
+    },
     { field: 'name', headerName: 'Name', width: 200, flex: 1 },
     { field: 'code', headerName: 'Code', width: 100 },
     { field: 'contactName', headerName: 'Contact', width: 150 },
@@ -150,33 +170,13 @@ export const SuppliersPage: React.FC = () => {
       ),
     },
     { field: 'partCount', headerName: 'Parts', width: 80, align: 'right' },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          {hasPermission('inventory.manage') && (
-            <>
-              <IconButton size="small" onClick={() => handleOpenEdit(params.row)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
-          )}
-        </Box>
-      ),
-    },
   ];
 
   const error = createMutation.error || updateMutation.error;
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Suppliers</Typography>
         {hasPermission('inventory.manage') && (
@@ -206,7 +206,7 @@ export const SuppliersPage: React.FC = () => {
         />
       </Paper>
 
-      <Paper sx={{ height: 600 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.items || []}
           columns={columns}
@@ -220,6 +220,8 @@ export const SuppliersPage: React.FC = () => {
           onPaginationModelChange={handlePaginationChange}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => handleOpenEdit(params.row)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
 

@@ -106,7 +106,8 @@ public class PreventiveMaintenanceController : ControllerBase
             WorkOrderDescription = request.WorkOrderDescription,
             Priority = Enum.Parse<WorkOrderPriority>(request.Priority),
             EstimatedHours = request.EstimatedHours,
-            IsActive = request.IsActive
+            IsActive = request.IsActive,
+            TaskTemplateId = request.TaskTemplateId
         };
 
         var created = await _pmService.CreateScheduleAsync(schedule, userId.Value, cancellationToken);
@@ -153,6 +154,7 @@ public class PreventiveMaintenanceController : ControllerBase
         schedule.Priority = Enum.Parse<WorkOrderPriority>(request.Priority);
         schedule.EstimatedHours = request.EstimatedHours;
         schedule.IsActive = request.IsActive;
+        schedule.TaskTemplateId = request.TaskTemplateId;
 
         var updated = await _pmService.UpdateScheduleAsync(schedule, userId.Value, cancellationToken);
 
@@ -260,6 +262,8 @@ public class PreventiveMaintenanceController : ControllerBase
             Priority = schedule.Priority.ToString(),
             EstimatedHours = schedule.EstimatedHours,
             IsActive = schedule.IsActive,
+            TaskTemplateId = schedule.TaskTemplateId,
+            TaskTemplateName = schedule.TaskTemplate?.Name,
             CreatedAt = schedule.CreatedAt,
             UpdatedAt = schedule.UpdatedAt
         };

@@ -82,7 +82,13 @@ public class PreventiveMaintenanceSchedule : BaseEntity
     /// </summary>
     public bool IsActive { get; set; } = true;
 
+    /// <summary>
+    /// Optional task template to apply to generated work orders
+    /// </summary>
+    public int? TaskTemplateId { get; set; }
+
     // Navigation properties
     public virtual Asset? Asset { get; set; }
+    public virtual WorkOrderTaskTemplate? TaskTemplate { get; set; }
     public virtual ICollection<WorkOrder> GeneratedWorkOrders { get; set; } = new List<WorkOrder>();
 }

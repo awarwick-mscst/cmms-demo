@@ -11,7 +11,10 @@
       "Bash(powershell -Command \"Get-Process -Name ''CMMS.API'' -ErrorAction SilentlyContinue | Stop-Process -Force\")",
       "Bash(tree:*)",
       "Bash(dotnet restore:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(npm start)"
     ]
   }
 }

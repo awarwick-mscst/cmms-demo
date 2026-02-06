@@ -67,48 +67,13 @@ export const UsersPage: React.FC = () => {
   });
 
   const columns: GridColDef[] = [
-    { field: 'username', headerName: 'Username', width: 130 },
-    { field: 'fullName', headerName: 'Name', width: 180 },
-    { field: 'email', headerName: 'Email', width: 220 },
-    { field: 'phone', headerName: 'Phone', width: 130 },
-    {
-      field: 'roles',
-      headerName: 'Roles',
-      width: 200,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-          {params.value?.map((role: string) => (
-            <Chip key={role} label={role} size="small" variant="outlined" />
-          ))}
-        </Box>
-      ),
-    },
-    {
-      field: 'isActive',
-      headerName: 'Status',
-      width: 100,
-      renderCell: (params) => (
-        <Chip
-          label={params.row.isLocked ? 'Locked' : params.value ? 'Active' : 'Inactive'}
-          color={params.row.isLocked ? 'error' : params.value ? 'success' : 'default'}
-          size="small"
-        />
-      ),
-    },
-    {
-      field: 'lastLoginAt',
-      headerName: 'Last Login',
-      width: 130,
-      valueFormatter: (params: any) =>
-        params.value ? new Date(params.value).toLocaleDateString() : 'Never',
-    },
     {
       field: 'actions',
-      headerName: 'Actions',
-      width: 180,
+      headerName: '',
+      width: 160,
       sortable: false,
       renderCell: (params) => (
-        <Box>
+        <Box onClick={(e) => e.stopPropagation()}>
           <Tooltip title="Edit">
             <IconButton
               size="small"
@@ -150,6 +115,41 @@ export const UsersPage: React.FC = () => {
         </Box>
       ),
     },
+    { field: 'username', headerName: 'Username', width: 130 },
+    { field: 'fullName', headerName: 'Name', width: 180 },
+    { field: 'email', headerName: 'Email', width: 220 },
+    { field: 'phone', headerName: 'Phone', width: 130 },
+    {
+      field: 'roles',
+      headerName: 'Roles',
+      width: 200,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+          {params.value?.map((role: string) => (
+            <Chip key={role} label={role} size="small" variant="outlined" />
+          ))}
+        </Box>
+      ),
+    },
+    {
+      field: 'isActive',
+      headerName: 'Status',
+      width: 100,
+      renderCell: (params) => (
+        <Chip
+          label={params.row.isLocked ? 'Locked' : params.value ? 'Active' : 'Inactive'}
+          color={params.row.isLocked ? 'error' : params.value ? 'success' : 'default'}
+          size="small"
+        />
+      ),
+    },
+    {
+      field: 'lastLoginAt',
+      headerName: 'Last Login',
+      width: 130,
+      valueFormatter: (params: any) =>
+        params.value ? new Date(params.value).toLocaleDateString() : 'Never',
+    },
   ];
 
   if (isLoading) {
@@ -157,7 +157,7 @@ export const UsersPage: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">User Management</Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -183,7 +183,7 @@ export const UsersPage: React.FC = () => {
       {/* LDAP Status Card */}
       <LdapStatusCard />
 
-      <Paper sx={{ height: 600 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.data || []}
           columns={columns}
@@ -192,6 +192,8 @@ export const UsersPage: React.FC = () => {
             pagination: { paginationModel: { pageSize: 25 } },
           }}
           disableRowSelectionOnClick
+          onRowClick={(params) => navigate(`/admin/users/${params.row.id}/edit`)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
 

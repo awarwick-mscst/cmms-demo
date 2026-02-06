@@ -38,6 +38,8 @@ import { HelpPage } from './pages/admin/HelpPage';
 import { PrintersPage } from './pages/admin/PrintersPage';
 import { LabelTemplatesPage } from './pages/admin/LabelTemplatesPage';
 import { LabelTemplateFormPage } from './pages/admin/LabelTemplateFormPage';
+import { TaskTemplatesPage } from './pages/admin/TaskTemplatesPage';
+import { TaskTemplateFormPage } from './pages/admin/TaskTemplateFormPage';
 import {
   ReportsPage,
   ReorderReportPage,
@@ -141,6 +143,9 @@ const ThemedApp: React.FC = () => {
                 <Route path="admin/users" element={<UsersPage />} />
                 <Route path="admin/users/new" element={<UserFormPage />} />
                 <Route path="admin/users/:id/edit" element={<UserFormPage />} />
+                <Route path="admin/task-templates" element={<TaskTemplatesPage />} />
+                <Route path="admin/task-templates/new" element={<TaskTemplateFormPage />} />
+                <Route path="admin/task-templates/:id/edit" element={<TaskTemplateFormPage />} />
                 <Route path="admin/printers" element={<PrintersPage />} />
                 <Route path="admin/label-templates" element={<LabelTemplatesPage />} />
                 <Route path="admin/label-templates/new" element={<LabelTemplateFormPage />} />

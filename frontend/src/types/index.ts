@@ -632,6 +632,8 @@ export interface PreventiveMaintenanceSchedule {
   priority: string;
   estimatedHours?: number;
   isActive: boolean;
+  taskTemplateId?: number;
+  taskTemplateName?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -663,6 +665,7 @@ export interface CreatePreventiveMaintenanceScheduleRequest {
   priority?: string;
   estimatedHours?: number;
   isActive?: boolean;
+  taskTemplateId?: number;
 }
 
 export interface UpdatePreventiveMaintenanceScheduleRequest extends CreatePreventiveMaintenanceScheduleRequest {}
@@ -701,6 +704,127 @@ export const WorkOrderStatuses = ['Draft', 'Open', 'InProgress', 'OnHold', 'Comp
 export const WorkOrderPriorities = ['Low', 'Medium', 'High', 'Critical', 'Emergency'] as const;
 export const LaborTypes = ['Regular', 'Overtime', 'Emergency'] as const;
 export const FrequencyTypes = ['Daily', 'Weekly', 'BiWeekly', 'Monthly', 'Quarterly', 'SemiAnnually', 'Annually', 'Custom'] as const;
+
+// Work Order Task Types
+
+export interface WorkOrderTask {
+  id: number;
+  workOrderId: number;
+  sortOrder: number;
+  description: string;
+  isCompleted: boolean;
+  completedAt?: string;
+  completedById?: number;
+  completedByName?: string;
+  notes?: string;
+  isRequired: boolean;
+  createdAt: string;
+}
+
+export interface WorkOrderTaskSummary {
+  totalTasks: number;
+  completedTasks: number;
+  requiredTasks: number;
+  completedRequiredTasks: number;
+  completionPercentage: number;
+  allRequiredCompleted: boolean;
+}
+
+export interface CreateWorkOrderTaskRequest {
+  description: string;
+  isRequired?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateWorkOrderTaskRequest {
+  description: string;
+  isRequired?: boolean;
+  notes?: string;
+}
+
+export interface CompleteTaskRequest {
+  notes?: string;
+}
+
+export interface ReorderTasksRequest {
+  taskIds: number[];
+}
+
+export interface ApplyTemplateRequest {
+  templateId: number;
+  clearExisting?: boolean;
+}
+
+// Task Template Types
+
+export interface WorkOrderTaskTemplate {
+  id: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  itemCount: number;
+  items: WorkOrderTaskTemplateItem[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface WorkOrderTaskTemplateSummary {
+  id: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  itemCount: number;
+  createdAt: string;
+}
+
+export interface WorkOrderTaskTemplateItem {
+  id: number;
+  sortOrder: number;
+  description: string;
+  isRequired: boolean;
+}
+
+export interface TaskTemplateDropdown {
+  id: number;
+  name: string;
+  itemCount: number;
+}
+
+export interface CreateWorkOrderTaskTemplateRequest {
+  name: string;
+  description?: string;
+  isActive?: boolean;
+  items: CreateWorkOrderTaskTemplateItemRequest[];
+}
+
+export interface UpdateWorkOrderTaskTemplateRequest {
+  name: string;
+  description?: string;
+  isActive?: boolean;
+  items: UpdateWorkOrderTaskTemplateItemRequest[];
+}
+
+export interface CreateWorkOrderTaskTemplateItemRequest {
+  sortOrder: number;
+  description: string;
+  isRequired?: boolean;
+}
+
+export interface UpdateWorkOrderTaskTemplateItemRequest {
+  id?: number;
+  sortOrder: number;
+  description: string;
+  isRequired?: boolean;
+}
+
+export interface TaskTemplateFilter {
+  search?: string;
+  isActive?: boolean;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDescending?: boolean;
+}
 
 // Work Session Types (Active Time Tracking)
 

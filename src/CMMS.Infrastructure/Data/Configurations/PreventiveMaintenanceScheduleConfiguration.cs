@@ -75,6 +75,9 @@ public class PreventiveMaintenanceScheduleConfiguration : IEntityTypeConfigurati
             .HasColumnName("is_active")
             .HasDefaultValue(true);
 
+        builder.Property(p => p.TaskTemplateId)
+            .HasColumnName("task_template_id");
+
         // Audit fields
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
@@ -100,6 +103,11 @@ public class PreventiveMaintenanceScheduleConfiguration : IEntityTypeConfigurati
         builder.HasOne(p => p.Asset)
             .WithMany()
             .HasForeignKey(p => p.AssetId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(p => p.TaskTemplate)
+            .WithMany(t => t.PreventiveMaintenanceSchedules)
+            .HasForeignKey(p => p.TaskTemplateId)
             .OnDelete(DeleteBehavior.SetNull);
 
         // Indexes

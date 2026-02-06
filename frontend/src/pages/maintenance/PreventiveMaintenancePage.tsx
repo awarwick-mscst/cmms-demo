@@ -118,6 +118,26 @@ export const PreventiveMaintenancePage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          {hasPermission('preventive-maintenance.manage') && (
+            <>
+              <IconButton size="small" onClick={() => navigate(`/maintenance/pm-schedules/${params.row.id}/edit`)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </>
+          )}
+        </Box>
+      ),
+    },
     { field: 'name', headerName: 'Name', width: 200, flex: 1 },
     { field: 'assetName', headerName: 'Asset', width: 150 },
     {
@@ -179,32 +199,12 @@ export const PreventiveMaintenancePage: React.FC = () => {
         />
       ),
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          {hasPermission('preventive-maintenance.manage') && (
-            <>
-              <IconButton size="small" onClick={() => navigate(`/maintenance/pm-schedules/${params.row.id}/edit`)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
-          )}
-        </Box>
-      ),
-    },
   ];
 
   const canManage = hasPermission('preventive-maintenance.manage');
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Preventive Maintenance Schedules</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -306,7 +306,7 @@ export const PreventiveMaintenancePage: React.FC = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ height: 600 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.items || []}
           columns={columns}
@@ -320,6 +320,8 @@ export const PreventiveMaintenancePage: React.FC = () => {
           onPaginationModelChange={handlePaginationChange}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => navigate(`/maintenance/pm-schedules/${params.row.id}/edit`)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
     </Box>

@@ -50,6 +50,8 @@ builder.Services.AddScoped<IPartCategoryService, PartCategoryService>();
 builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
 builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddScoped<IWorkOrderService, WorkOrderService>();
+builder.Services.AddScoped<IWorkOrderTaskService, WorkOrderTaskService>();
+builder.Services.AddScoped<IWorkOrderTaskTemplateService, WorkOrderTaskTemplateService>();
 builder.Services.AddScoped<IPreventiveMaintenanceService, PreventiveMaintenanceService>();
 builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<IPrintService, PrintService>();

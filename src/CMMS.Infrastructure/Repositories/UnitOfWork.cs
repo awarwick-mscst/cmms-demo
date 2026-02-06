@@ -32,6 +32,9 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<WorkOrderHistory>? _workOrderHistory;
     private IRepository<WorkOrderComment>? _workOrderComments;
     private IRepository<WorkOrderLabor>? _workOrderLabor;
+    private IRepository<WorkOrderTask>? _workOrderTasks;
+    private IRepository<WorkOrderTaskTemplate>? _workOrderTaskTemplates;
+    private IRepository<WorkOrderTaskTemplateItem>? _workOrderTaskTemplateItems;
     private IRepository<PreventiveMaintenanceSchedule>? _preventiveMaintenanceSchedules;
     private IRepository<WorkSession>? _workSessions;
     private IRepository<LabelTemplate>? _labelTemplates;
@@ -64,6 +67,9 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<WorkOrderHistory> WorkOrderHistory => _workOrderHistory ??= new Repository<WorkOrderHistory>(_context);
     public IRepository<WorkOrderComment> WorkOrderComments => _workOrderComments ??= new Repository<WorkOrderComment>(_context);
     public IRepository<WorkOrderLabor> WorkOrderLabor => _workOrderLabor ??= new Repository<WorkOrderLabor>(_context);
+    public IRepository<WorkOrderTask> WorkOrderTasks => _workOrderTasks ??= new Repository<WorkOrderTask>(_context);
+    public IRepository<WorkOrderTaskTemplate> WorkOrderTaskTemplates => _workOrderTaskTemplates ??= new Repository<WorkOrderTaskTemplate>(_context);
+    public IRepository<WorkOrderTaskTemplateItem> WorkOrderTaskTemplateItems => _workOrderTaskTemplateItems ??= new Repository<WorkOrderTaskTemplateItem>(_context);
     public IRepository<PreventiveMaintenanceSchedule> PreventiveMaintenanceSchedules => _preventiveMaintenanceSchedules ??= new Repository<PreventiveMaintenanceSchedule>(_context);
     public IRepository<WorkSession> WorkSessions => _workSessions ??= new Repository<WorkSession>(_context);
     public IRepository<LabelTemplate> LabelTemplates => _labelTemplates ??= new Repository<LabelTemplate>(_context);

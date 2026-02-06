@@ -44,6 +44,7 @@ import {
   Assessment as ReportsIcon,
   Brightness4 as Brightness4Icon,
   Brightness7 as Brightness7Icon,
+  Checklist as ChecklistIcon,
 } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -91,6 +92,7 @@ const menuItems: MenuItem[] = [
     icon: <AdminIcon />,
     children: [
       { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
+      { text: 'Task Templates', icon: <ChecklistIcon />, path: '/admin/task-templates' },
       { text: 'Label Printers', icon: <PrintIcon />, path: '/admin/printers' },
       { text: 'Label Templates', icon: <LabelIcon />, path: '/admin/label-templates' },
       { text: 'Help', icon: <HelpIcon />, path: '/admin/help' },
@@ -323,6 +325,10 @@ export const Layout: React.FC = () => {
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           mt: 8,
+          height: 'calc(100vh - 64px)',
+          overflow: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <Outlet />

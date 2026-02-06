@@ -86,6 +86,7 @@ public class PreventiveMaintenanceService : IPreventiveMaintenanceService
     {
         return await _unitOfWork.PreventiveMaintenanceSchedules.Query()
             .Include(p => p.Asset)
+            .Include(p => p.TaskTemplate)
             .Include(p => p.GeneratedWorkOrders.Where(w => !w.IsDeleted).OrderByDescending(w => w.CreatedAt).Take(10))
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
@@ -192,6 +193,8 @@ public class PreventiveMaintenanceService : IPreventiveMaintenanceService
     {
         var schedule = await _unitOfWork.PreventiveMaintenanceSchedules.Query()
             .Include(p => p.Asset)
+            .Include(p => p.TaskTemplate)
+                .ThenInclude(t => t!.Items)
             .FirstOrDefaultAsync(p => p.Id == scheduleId, cancellationToken);
 
         if (schedule == null || !schedule.IsActive)
@@ -214,6 +217,26 @@ public class PreventiveMaintenanceService : IPreventiveMaintenanceService
         };
 
         var created = await _workOrderService.CreateWorkOrderAsync(workOrder, createdBy, cancellationToken);
+
+        // Copy tasks from template if one is assigned
+        if (schedule.TaskTemplate != null && schedule.TaskTemplate.Items.Any())
+        {
+            var sortOrder = 0;
+            foreach (var item in schedule.TaskTemplate.Items.OrderBy(i => i.SortOrder))
+            {
+                var task = new WorkOrderTask
+                {
+                    WorkOrderId = created.Id,
+                    SortOrder = sortOrder++,
+                    Description = item.Description,
+                    IsRequired = item.IsRequired,
+                    IsCompleted = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.WorkOrderTasks.AddAsync(task, cancellationToken);
+            }
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
 
         // Submit the work order to Open status
         await _workOrderService.SubmitWorkOrderAsync(created.Id, createdBy, "Auto-generated from PM schedule", cancellationToken);

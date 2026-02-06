@@ -111,4 +111,5 @@ public class WorkOrder : BaseEntity
     public virtual ICollection<WorkOrderComment> Comments { get; set; } = new List<WorkOrderComment>();
     public virtual ICollection<WorkOrderLabor> LaborEntries { get; set; } = new List<WorkOrderLabor>();
     public virtual ICollection<AssetPart> Parts { get; set; } = new List<AssetPart>();
+    public virtual ICollection<WorkOrderTask> Tasks { get; set; } = new List<WorkOrderTask>();
 }

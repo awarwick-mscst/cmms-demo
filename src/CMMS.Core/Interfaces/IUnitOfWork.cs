@@ -28,6 +28,9 @@ public interface IUnitOfWork : IDisposable
     IRepository<WorkOrderHistory> WorkOrderHistory { get; }
     IRepository<WorkOrderComment> WorkOrderComments { get; }
     IRepository<WorkOrderLabor> WorkOrderLabor { get; }
+    IRepository<WorkOrderTask> WorkOrderTasks { get; }
+    IRepository<WorkOrderTaskTemplate> WorkOrderTaskTemplates { get; }
+    IRepository<WorkOrderTaskTemplateItem> WorkOrderTaskTemplateItems { get; }
     IRepository<PreventiveMaintenanceSchedule> PreventiveMaintenanceSchedules { get; }
     IRepository<WorkSession> WorkSessions { get; }
 

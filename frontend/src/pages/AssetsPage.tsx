@@ -85,6 +85,29 @@ export const AssetsPage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          <IconButton size="small" onClick={() => navigate(`/assets/${params.row.id}`)}>
+            <ViewIcon fontSize="small" />
+          </IconButton>
+          {hasPermission('assets.edit') && (
+            <IconButton size="small" onClick={() => navigate(`/assets/${params.row.id}/edit`)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+          {hasPermission('assets.delete') && (
+            <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+      ),
+    },
     { field: 'assetTag', headerName: 'Asset Tag', width: 130 },
     { field: 'name', headerName: 'Name', width: 200, flex: 1 },
     { field: 'categoryName', headerName: 'Category', width: 150 },
@@ -114,33 +137,10 @@ export const AssetsPage: React.FC = () => {
         />
       ),
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          <IconButton size="small" onClick={() => navigate(`/assets/${params.row.id}`)}>
-            <ViewIcon fontSize="small" />
-          </IconButton>
-          {hasPermission('assets.edit') && (
-            <IconButton size="small" onClick={() => navigate(`/assets/${params.row.id}/edit`)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          )}
-          {hasPermission('assets.delete') && (
-            <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          )}
-        </Box>
-      ),
-    },
   ];
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Assets</Typography>
         {hasPermission('assets.create') && (
@@ -208,7 +208,7 @@ export const AssetsPage: React.FC = () => {
         </Box>
       </Paper>
 
-      <Paper sx={{ height: 600 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.items || []}
           columns={columns}
@@ -222,6 +222,8 @@ export const AssetsPage: React.FC = () => {
           onPaginationModelChange={handlePaginationChange}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => navigate(`/assets/${params.row.id}`)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
     </Box>

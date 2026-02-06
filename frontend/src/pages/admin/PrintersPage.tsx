@@ -228,6 +228,44 @@ export const PrintersPage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 160,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          <Tooltip title="Test connection">
+            <IconButton
+              size="small"
+              onClick={() => handleTest(params.row.id)}
+              disabled={testingId === params.row.id}
+            >
+              <WifiIcon fontSize="small" color={testingId === params.row.id ? 'disabled' : 'primary'} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Print test label">
+            <IconButton
+              size="small"
+              onClick={() => handleTestPrint(params.row.id)}
+              disabled={testingId === params.row.id}
+            >
+              <PrintIcon fontSize="small" color={testingId === params.row.id ? 'disabled' : 'secondary'} />
+            </IconButton>
+          </Tooltip>
+          {canManage && (
+            <>
+              <IconButton size="small" onClick={() => handleOpenEdit(params.row)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </>
+          )}
+        </Box>
+      ),
+    },
     { field: 'name', headerName: 'Name', width: 180, flex: 1 },
     {
       field: 'connectionType',
@@ -275,48 +313,10 @@ export const PrintersPage: React.FC = () => {
         params.value ? (
           <StarIcon color="primary" fontSize="small" />
         ) : canManage ? (
-          <IconButton size="small" onClick={() => handleSetDefault(params.row.id)}>
+          <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleSetDefault(params.row.id); }}>
             <StarBorderIcon fontSize="small" />
           </IconButton>
         ) : null,
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 180,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          <Tooltip title="Test connection">
-            <IconButton
-              size="small"
-              onClick={() => handleTest(params.row.id)}
-              disabled={testingId === params.row.id}
-            >
-              <WifiIcon fontSize="small" color={testingId === params.row.id ? 'disabled' : 'primary'} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Print test label">
-            <IconButton
-              size="small"
-              onClick={() => handleTestPrint(params.row.id)}
-              disabled={testingId === params.row.id}
-            >
-              <PrintIcon fontSize="small" color={testingId === params.row.id ? 'disabled' : 'secondary'} />
-            </IconButton>
-          </Tooltip>
-          {canManage && (
-            <>
-              <IconButton size="small" onClick={() => handleOpenEdit(params.row)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
-          )}
-        </Box>
-      ),
     },
   ];
 
@@ -328,7 +328,7 @@ export const PrintersPage: React.FC = () => {
   );
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Label Printers</Typography>
         {canManage && (
@@ -348,13 +348,15 @@ export const PrintersPage: React.FC = () => {
         </Alert>
       )}
 
-      <Paper sx={{ height: 500 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.data || []}
           columns={columns}
           loading={isLoading}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => handleOpenEdit(params.row)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
 

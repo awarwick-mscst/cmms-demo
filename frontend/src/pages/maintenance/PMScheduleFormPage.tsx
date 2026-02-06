@@ -18,6 +18,7 @@ import { Save as SaveIcon, ArrowBack as BackIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { preventiveMaintenanceService } from '../../services/preventiveMaintenanceService';
 import { assetService } from '../../services/assetService';
+import { taskTemplateService } from '../../services/taskTemplateService';
 import {
   CreatePreventiveMaintenanceScheduleRequest,
   FrequencyTypes,
@@ -81,6 +82,11 @@ export const PMScheduleFormPage: React.FC = () => {
     queryFn: () => assetService.getAssets({ pageSize: 100 }),
   });
 
+  const { data: templatesData } = useQuery({
+    queryKey: ['activeTaskTemplates'],
+    queryFn: () => taskTemplateService.getActiveTemplates(),
+  });
+
   useEffect(() => {
     if (scheduleData?.data) {
       const schedule = scheduleData.data;
@@ -99,6 +105,7 @@ export const PMScheduleFormPage: React.FC = () => {
         priority: schedule.priority,
         estimatedHours: schedule.estimatedHours,
         isActive: schedule.isActive,
+        taskTemplateId: schedule.taskTemplateId,
       });
     }
   }, [scheduleData, reset]);
@@ -295,6 +302,29 @@ export const PMScheduleFormPage: React.FC = () => {
                           label="Work Order Description"
                           placeholder="Instructions for the generated work orders..."
                         />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Controller
+                      name="taskTemplateId"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          select
+                          fullWidth
+                          label="Task Template"
+                          value={field.value || ''}
+                          helperText="Optional: Assign a task checklist template to generated work orders"
+                        >
+                          <MenuItem value="">No task template</MenuItem>
+                          {templatesData?.data?.map((template) => (
+                            <MenuItem key={template.id} value={template.id}>
+                              {template.name} ({template.itemCount} tasks)
+                            </MenuItem>
+                          ))}
+                        </TextField>
                       )}
                     />
                   </Grid>

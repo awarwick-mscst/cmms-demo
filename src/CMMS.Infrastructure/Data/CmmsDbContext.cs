@@ -38,6 +38,9 @@ public class CmmsDbContext : DbContext
     public DbSet<WorkOrderHistory> WorkOrderHistory => Set<WorkOrderHistory>();
     public DbSet<WorkOrderComment> WorkOrderComments => Set<WorkOrderComment>();
     public DbSet<WorkOrderLabor> WorkOrderLabor => Set<WorkOrderLabor>();
+    public DbSet<WorkOrderTask> WorkOrderTasks => Set<WorkOrderTask>();
+    public DbSet<WorkOrderTaskTemplate> WorkOrderTaskTemplates => Set<WorkOrderTaskTemplate>();
+    public DbSet<WorkOrderTaskTemplateItem> WorkOrderTaskTemplateItems => Set<WorkOrderTaskTemplateItem>();
     public DbSet<PreventiveMaintenanceSchedule> PreventiveMaintenanceSchedules => Set<PreventiveMaintenanceSchedule>();
     public DbSet<WorkSession> WorkSessions => Set<WorkSession>();
 

@@ -66,6 +66,29 @@ export const LabelTemplatesPage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: 'actions',
+      headerName: '',
+      width: 80,
+      sortable: false,
+      renderCell: (params) => (
+        <Box onClick={(e) => e.stopPropagation()}>
+          {canManage && (
+            <>
+              <IconButton
+                size="small"
+                onClick={() => navigate(`/admin/label-templates/${params.row.id}/edit`)}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </>
+          )}
+        </Box>
+      ),
+    },
     { field: 'name', headerName: 'Name', width: 200, flex: 1 },
     { field: 'description', headerName: 'Description', width: 250 },
     {
@@ -89,38 +112,15 @@ export const LabelTemplatesPage: React.FC = () => {
         params.value ? (
           <StarIcon color="primary" fontSize="small" />
         ) : canManage ? (
-          <IconButton size="small" onClick={() => handleSetDefault(params.row.id)}>
+          <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleSetDefault(params.row.id); }}>
             <StarBorderIcon fontSize="small" />
           </IconButton>
         ) : null,
     },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          {canManage && (
-            <>
-              <IconButton
-                size="small"
-                onClick={() => navigate(`/admin/label-templates/${params.row.id}/edit`)}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
-          )}
-        </Box>
-      ),
-    },
   ];
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Label Templates</Typography>
         {canManage && (
@@ -134,13 +134,15 @@ export const LabelTemplatesPage: React.FC = () => {
         )}
       </Box>
 
-      <Paper sx={{ height: 500 }}>
+      <Paper sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <DataGrid
           rows={data?.data || []}
           columns={columns}
           loading={isLoading}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
+          onRowClick={(params) => navigate(`/admin/label-templates/${params.row.id}/edit`)}
+          sx={{ flex: 1, '& .MuiDataGrid-row': { cursor: 'pointer' } }}
         />
       </Paper>
     </Box>
