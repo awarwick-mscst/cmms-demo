@@ -38,6 +38,9 @@ public interface IUnitOfWork : IDisposable
     IRepository<LabelTemplate> LabelTemplates { get; }
     IRepository<LabelPrinter> LabelPrinters { get; }
 
+    // Attachments
+    IRepository<Attachment> Attachments { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);

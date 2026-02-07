@@ -39,6 +39,7 @@ import { storageLocationService } from '../../services/storageLocationService';
 import { PartDetail, StockAdjustmentRequest, StockTransferRequest, TransactionTypes } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { PrintLabelDialog } from '../../components/inventory/PrintLabelDialog';
+import { AttachmentManager, PrimaryImage } from '../../components/attachments';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -256,6 +257,10 @@ export const PartDetailPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
+          <Box sx={{ mb: 2 }}>
+            <PrimaryImage entityType="Part" entityId={Number(id)} height={180} />
+          </Box>
+
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>Stock Summary</Typography>
@@ -283,6 +288,7 @@ export const PartDetailPage: React.FC = () => {
             <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
               <Tab label="Stock by Location" />
               <Tab label="Transaction History" />
+              <Tab label="Attachments" />
             </Tabs>
 
             <TabPanel value={tabValue} index={0}>
@@ -371,6 +377,18 @@ export const PartDetailPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={2}>
+              <Box sx={{ px: 2 }}>
+                <AttachmentManager
+                  entityType="Part"
+                  entityId={Number(id)}
+                  title="Part Attachments"
+                  canEdit={hasPermission('inventory.manage')}
+                  defaultExpanded={true}
+                />
+              </Box>
             </TabPanel>
           </Paper>
         </Grid>

@@ -17,6 +17,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   confirmColor?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
+  isLoading?: boolean;
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -28,6 +29,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   confirmColor = 'primary',
+  isLoading = false,
 }) => {
   return (
     <Dialog open={open} onClose={onCancel}>
@@ -36,9 +38,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>{cancelText}</Button>
-        <Button onClick={onConfirm} color={confirmColor} variant="contained">
-          {confirmText}
+        <Button onClick={onCancel} disabled={isLoading}>{cancelText}</Button>
+        <Button onClick={onConfirm} color={confirmColor} variant="contained" disabled={isLoading}>
+          {isLoading ? 'Processing...' : confirmText}
         </Button>
       </DialogActions>
     </Dialog>

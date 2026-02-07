@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { assetService } from '../services/assetService';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { useAuth } from '../hooks/useAuth';
+import { AttachmentManager, PrimaryImage } from '../components/attachments';
 
 export const AssetDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -140,6 +141,10 @@ export const AssetDetailPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
+          <Box sx={{ mb: 3 }}>
+            <PrimaryImage entityType="Asset" entityId={asset.id} height={220} />
+          </Box>
+
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -207,6 +212,14 @@ export const AssetDetailPage: React.FC = () => {
             </Paper>
           </Grid>
         )}
+
+        <Grid item xs={12}>
+          <AttachmentManager
+            entityType="Asset"
+            entityId={asset.id}
+            canEdit={hasPermission('assets.edit')}
+          />
+        </Grid>
       </Grid>
     </Box>
   );

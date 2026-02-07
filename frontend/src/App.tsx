@@ -40,6 +40,8 @@ import { LabelTemplatesPage } from './pages/admin/LabelTemplatesPage';
 import { LabelTemplateFormPage } from './pages/admin/LabelTemplateFormPage';
 import { TaskTemplatesPage } from './pages/admin/TaskTemplatesPage';
 import { TaskTemplateFormPage } from './pages/admin/TaskTemplateFormPage';
+import { BackupPage } from './pages/admin/BackupPage';
+import { DatabaseConfigPage } from './pages/admin/DatabaseConfigPage';
 import {
   ReportsPage,
   ReorderReportPage,
@@ -50,6 +52,7 @@ import {
   StockMovementPage,
   WorkOrderSummaryPage,
 } from './pages/reports';
+import { ScannerPage } from './pages/ScannerPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -108,6 +111,7 @@ const ThemedApp: React.FC = () => {
                 <Route path="assets/:id/edit" element={<AssetFormPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
                 <Route path="locations" element={<LocationsPage />} />
+                <Route path="scanner" element={<ScannerPage />} />
 
                 {/* Inventory Routes */}
                 <Route path="inventory/receive" element={<ReceiveInventoryPage />} />
@@ -151,6 +155,8 @@ const ThemedApp: React.FC = () => {
                 <Route path="admin/label-templates/new" element={<LabelTemplateFormPage />} />
                 <Route path="admin/label-templates/:id/edit" element={<LabelTemplateFormPage />} />
                 <Route path="admin/help" element={<HelpPage />} />
+                <Route path="admin/backup" element={<BackupPage />} />
+                <Route path="admin/database" element={<DatabaseConfigPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

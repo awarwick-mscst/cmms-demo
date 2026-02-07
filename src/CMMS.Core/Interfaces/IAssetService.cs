@@ -7,6 +7,7 @@ public interface IAssetService
     Task<PagedResult<Asset>> GetAssetsAsync(AssetFilter filter, CancellationToken cancellationToken = default);
     Task<Asset?> GetAssetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<Asset?> GetAssetByTagAsync(string assetTag, CancellationToken cancellationToken = default);
+    Task<Asset?> GetAssetByBarcodeAsync(string barcode, CancellationToken cancellationToken = default);
     Task<Asset> CreateAssetAsync(Asset asset, int createdBy, CancellationToken cancellationToken = default);
     Task<Asset> UpdateAssetAsync(Asset asset, int updatedBy, CancellationToken cancellationToken = default);
     Task<bool> DeleteAssetAsync(int id, int deletedBy, CancellationToken cancellationToken = default);

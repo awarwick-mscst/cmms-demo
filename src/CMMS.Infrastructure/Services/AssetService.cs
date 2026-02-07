@@ -30,7 +30,8 @@ public class AssetService : IAssetService
                 a.Name.ToLower().Contains(search) ||
                 a.AssetTag.ToLower().Contains(search) ||
                 (a.Description != null && a.Description.ToLower().Contains(search)) ||
-                (a.SerialNumber != null && a.SerialNumber.ToLower().Contains(search)));
+                (a.SerialNumber != null && a.SerialNumber.ToLower().Contains(search)) ||
+                (a.Barcode != null && a.Barcode.ToLower().Contains(search)));
         }
 
         if (filter.CategoryId.HasValue)
@@ -105,6 +106,15 @@ public class AssetService : IAssetService
             .Include(a => a.Category)
             .Include(a => a.Location)
             .FirstOrDefaultAsync(a => a.AssetTag == assetTag, cancellationToken);
+    }
+
+    public async Task<Asset?> GetAssetByBarcodeAsync(string barcode, CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.Assets.Query()
+            .Include(a => a.Category)
+            .Include(a => a.Location)
+            .Include(a => a.AssignedUser)
+            .FirstOrDefaultAsync(a => a.Barcode == barcode, cancellationToken);
     }
 
     public async Task<Asset> CreateAssetAsync(Asset asset, int createdBy, CancellationToken cancellationToken = default)

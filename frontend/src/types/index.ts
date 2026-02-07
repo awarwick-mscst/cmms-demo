@@ -1231,3 +1231,55 @@ export interface AssetMaintenanceHistoryFilter {
   fromDate?: string;
   toDate?: string;
 }
+
+// Attachment Types
+
+export interface Attachment {
+  id: number;
+  entityType: string;
+  entityId: number;
+  attachmentType: string;
+  title: string;
+  fileName: string;
+  filePath: string;
+  url: string;
+  fileSize: number;
+  mimeType: string;
+  description?: string;
+  displayOrder: number;
+  isPrimary: boolean;
+  uploadedAt: string;
+  uploadedBy?: number;
+  uploadedByName?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface UpdateAttachmentRequest {
+  title?: string;
+  description?: string;
+  displayOrder?: number;
+}
+
+export interface UploadProgress {
+  fileName: string;
+  progress: number;
+  status: 'pending' | 'uploading' | 'success' | 'error';
+  error?: string;
+}
+
+export const AttachmentTypes = ['Image', 'Document'] as const;
+
+// Barcode Scanner Types
+
+export interface BarcodeLookupResult {
+  type: 'Part' | 'Asset';
+  id: number;
+  name: string;
+  code: string;
+  description?: string;
+  barcode: string;
+}
+export const AllowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const;
+export const AllowedDocumentExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt'] as const;
+export const MaxFileSize = 10 * 1024 * 1024; // 10 MB

@@ -306,6 +306,10 @@ public class AssetConfiguration : IEntityTypeConfiguration<Asset>
             .IsUnique()
             .HasFilter("[is_deleted] = 0");
 
+        builder.HasIndex(a => a.Barcode)
+            .IsUnique()
+            .HasFilter("[is_deleted] = 0 AND [barcode] IS NOT NULL");
+
         builder.HasQueryFilter(a => !a.IsDeleted);
     }
 }

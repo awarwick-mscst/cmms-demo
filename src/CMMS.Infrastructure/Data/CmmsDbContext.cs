@@ -48,6 +48,9 @@ public class CmmsDbContext : DbContext
     public DbSet<LabelTemplate> LabelTemplates => Set<LabelTemplate>();
     public DbSet<LabelPrinter> LabelPrinters => Set<LabelPrinter>();
 
+    // Attachments
+    public DbSet<Attachment> Attachments => Set<Attachment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

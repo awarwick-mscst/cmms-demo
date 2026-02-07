@@ -9,6 +9,7 @@ public interface IPartService
     Task<PagedResult<Part>> GetPartsAsync(PartFilter filter, CancellationToken cancellationToken = default);
     Task<Part?> GetPartByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<Part?> GetPartByNumberAsync(string partNumber, CancellationToken cancellationToken = default);
+    Task<Part?> GetPartByBarcodeAsync(string barcode, CancellationToken cancellationToken = default);
     Task<Part> CreatePartAsync(Part part, int createdBy, CancellationToken cancellationToken = default);
     Task<Part> UpdatePartAsync(Part part, int updatedBy, CancellationToken cancellationToken = default);
     Task<bool> DeletePartAsync(int id, int deletedBy, CancellationToken cancellationToken = default);

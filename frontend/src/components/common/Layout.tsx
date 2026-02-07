@@ -45,6 +45,9 @@ import {
   Brightness4 as Brightness4Icon,
   Brightness7 as Brightness7Icon,
   Checklist as ChecklistIcon,
+  QrCodeScanner as QrCodeScannerIcon,
+  Backup as BackupIcon,
+  Storage as StorageIcon,
 } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -63,6 +66,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+  { text: 'Scanner', icon: <QrCodeScannerIcon />, path: '/scanner' },
   { text: 'Assets', icon: <InventoryIcon />, path: '/assets' },
   { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
   { text: 'Locations', icon: <LocationIcon />, path: '/locations' },
@@ -95,6 +99,8 @@ const menuItems: MenuItem[] = [
       { text: 'Task Templates', icon: <ChecklistIcon />, path: '/admin/task-templates' },
       { text: 'Label Printers', icon: <PrintIcon />, path: '/admin/printers' },
       { text: 'Label Templates', icon: <LabelIcon />, path: '/admin/label-templates' },
+      { text: 'Backup', icon: <BackupIcon />, path: '/admin/backup' },
+      { text: 'Database', icon: <StorageIcon />, path: '/admin/database' },
       { text: 'Help', icon: <HelpIcon />, path: '/admin/help' },
     ],
   },

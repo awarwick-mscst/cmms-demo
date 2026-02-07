@@ -56,6 +56,19 @@ builder.Services.AddScoped<IPreventiveMaintenanceService, PreventiveMaintenanceS
 builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<IPrintService, PrintService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IFileStorageService>(sp =>
+{
+    var env = sp.GetRequiredService<IWebHostEnvironment>();
+    var logger = sp.GetRequiredService<ILogger<FileStorageService>>();
+    return new FileStorageService(env.WebRootPath, logger);
+});
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<IBackupService, BackupService>();
+builder.Services.AddSingleton<IDatabaseConfigService>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<DatabaseConfigService>>();
+    return new DatabaseConfigService(logger);
+});
 
 // Configure LDAP settings
 builder.Services.Configure<LdapSettings>(builder.Configuration.GetSection(LdapSettings.SectionName));
@@ -340,6 +353,9 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+// Serve static files (including uploads)
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

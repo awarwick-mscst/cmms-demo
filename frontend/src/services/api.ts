@@ -2,7 +2,29 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { store } from '../store';
 import { logout, setTokens } from '../store/authSlice';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://fragbox:5000/api/v1';
+// Dynamically determine API URL based on how the user is accessing the app
+// This allows the app to work via hostname, IP address, or localhost
+const getApiBaseUrl = (): string => {
+  // If explicitly set in environment, use that
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+
+  const { protocol, hostname, port } = window.location;
+
+  // If accessing via standard HTTPS port (443) or no port specified,
+  // assume we're behind a reverse proxy - use same origin
+  if (protocol === 'https:' && (!port || port === '443')) {
+    return `${protocol}//${hostname}/api/v1`;
+  }
+
+  // Direct access - use appropriate port
+  // Use port 5001 for HTTPS, port 5000 for HTTP
+  const apiPort = protocol === 'https:' ? 5001 : 5000;
+  return `${protocol}//${hostname}:${apiPort}/api/v1`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 
 const api = axios.create({

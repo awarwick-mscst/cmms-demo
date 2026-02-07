@@ -39,6 +39,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<WorkSession>? _workSessions;
     private IRepository<LabelTemplate>? _labelTemplates;
     private IRepository<LabelPrinter>? _labelPrinters;
+    private IRepository<Attachment>? _attachments;
 
     public UnitOfWork(CmmsDbContext context)
     {
@@ -74,6 +75,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<WorkSession> WorkSessions => _workSessions ??= new Repository<WorkSession>(_context);
     public IRepository<LabelTemplate> LabelTemplates => _labelTemplates ??= new Repository<LabelTemplate>(_context);
     public IRepository<LabelPrinter> LabelPrinters => _labelPrinters ??= new Repository<LabelPrinter>(_context);
+    public IRepository<Attachment> Attachments => _attachments ??= new Repository<Attachment>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

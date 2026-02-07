@@ -101,6 +101,15 @@ public class PartService : IPartService
             .FirstOrDefaultAsync(p => p.PartNumber == partNumber, cancellationToken);
     }
 
+    public async Task<Part?> GetPartByBarcodeAsync(string barcode, CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.Parts.Query()
+            .Include(p => p.Category)
+            .Include(p => p.Supplier)
+            .Include(p => p.Stocks)
+            .FirstOrDefaultAsync(p => p.Barcode == barcode, cancellationToken);
+    }
+
     public async Task<Part> CreatePartAsync(Part part, int createdBy, CancellationToken cancellationToken = default)
     {
         part.CreatedBy = createdBy;

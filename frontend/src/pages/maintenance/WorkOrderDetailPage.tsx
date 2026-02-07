@@ -50,6 +50,7 @@ import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { useAuth } from '../../hooks/useAuth';
 import { LaborTypes } from '../../types';
 import { WorkOrderTaskList } from '../../components/workorder/WorkOrderTaskList';
+import { AttachmentManager } from '../../components/attachments';
 
 const statusColors: Record<string, 'success' | 'warning' | 'error' | 'default' | 'info' | 'primary'> = {
   Draft: 'default',
@@ -535,6 +536,7 @@ export const WorkOrderDetailPage: React.FC = () => {
               <Tab label="Comments" />
               <Tab label="Labor" />
               <Tab label="Parts" />
+              <Tab label="Attachments" />
               <Tab label="History" />
             </Tabs>
 
@@ -667,6 +669,18 @@ export const WorkOrderDetailPage: React.FC = () => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={4}>
+              <Box sx={{ px: 2 }}>
+                <AttachmentManager
+                  entityType="WorkOrder"
+                  entityId={Number(id)}
+                  title="Work Order Attachments"
+                  canEdit={canEdit && isWorkOrderActive}
+                  defaultExpanded={true}
+                />
+              </Box>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={5}>
               <Box sx={{ px: 2 }}>
                 <List>
                   {historyData?.data?.map((history) => (
