@@ -1,0 +1,55 @@
+@page
+@model LicensingServer.Web.Pages.Activations.IndexModel
+@{
+    ViewData["Title"] = "Activations";
+}
+
+<h2 class="mb-4">All Activations</h2>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Machine</th>
+                    <th>Customer</th>
+                    <th>License</th>
+                    <th>Tier</th>
+                    <th>Status</th>
+                    <th>Activated</th>
+                    <th>Last Phone Home</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var activation in Model.Activations)
+                {
+                    <tr>
+                        <td>
+                            <strong>@activation.MachineName</strong>
+                            <br /><small class="text-muted font-monospace">@activation.HardwareId[..Math.Min(16, activation.HardwareId.Length)]...</small>
+                        </td>
+                        <td>@activation.License.Customer.CompanyName</td>
+                        <td><a href="/Licenses/Details?id=@activation.LicenseId">#@activation.LicenseId</a></td>
+                        <td>
+                            @if (activation.License.Tier == "Enterprise") { <span class="badge bg-danger">Enterprise</span> }
+                            else if (activation.License.Tier == "Pro") { <span class="badge bg-primary">Pro</span> }
+                            else { <span class="badge bg-secondary">Basic</span> }
+                        </td>
+                        <td>
+                            @if (activation.IsActive) { <span class="badge bg-success">Active</span> }
+                            else { <span class="badge bg-secondary">Deactivated</span> }
+                        </td>
+                        <td>@activation.ActivatedAt.ToString("g")</td>
+                        <td>@(activation.LastPhoneHome?.ToString("g") ?? "-")</td>
+                        <td><small class="text-muted">@(activation.LastIpAddress ?? "-")</small></td>
+                    </tr>
+                }
+                @if (!Model.Activations.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">No activations yet.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

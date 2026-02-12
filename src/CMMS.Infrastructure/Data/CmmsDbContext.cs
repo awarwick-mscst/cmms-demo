@@ -51,6 +51,16 @@ public class CmmsDbContext : DbContext
     // Attachments
     public DbSet<Attachment> Attachments => Set<Attachment>();
 
+    // Licensing
+    public DbSet<LicenseInfo> LicenseInfos => Set<LicenseInfo>();
+
+    // Notifications
+    public DbSet<NotificationQueue> NotificationQueue => Set<NotificationQueue>();
+    public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();
+    public DbSet<UserNotificationPreference> UserNotificationPreferences => Set<UserNotificationPreference>();
+    public DbSet<IntegrationSetting> IntegrationSettings => Set<IntegrationSetting>();
+    public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

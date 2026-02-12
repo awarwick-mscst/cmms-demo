@@ -1,3 +1,4 @@
+using CMMS.API.Attributes;
 using CMMS.Core.Entities;
 using CMMS.Core.Interfaces;
 using CMMS.Shared.DTOs;
@@ -9,6 +10,7 @@ namespace CMMS.API.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize]
+[RequiresFeature("inventory")]
 public class SuppliersController : ControllerBase
 {
     private readonly ISupplierService _supplierService;

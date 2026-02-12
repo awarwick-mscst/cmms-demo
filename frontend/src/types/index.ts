@@ -1283,3 +1283,173 @@ export interface BarcodeLookupResult {
 export const AllowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const;
 export const AllowedDocumentExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.txt'] as const;
 export const MaxFileSize = 10 * 1024 * 1024; // 10 MB
+
+// Notification Types
+
+export interface NotificationQueueItem {
+  id: number;
+  type: string;
+  recipientUserId?: number;
+  recipientEmail: string;
+  recipientName?: string;
+  subject: string;
+  status: string;
+  retryCount: number;
+  scheduledFor: string;
+  processedAt?: string;
+  errorMessage?: string;
+  referenceType?: string;
+  referenceId?: number;
+  createdAt: string;
+}
+
+export interface NotificationLogItem {
+  id: number;
+  type: string;
+  recipientEmail: string;
+  subject: string;
+  channel: string;
+  success: boolean;
+  externalMessageId?: string;
+  errorMessage?: string;
+  sentAt: string;
+  referenceType?: string;
+  referenceId?: number;
+}
+
+export interface UserNotificationPreference {
+  id: number;
+  userId: number;
+  notificationType: string;
+  notificationTypeDisplay: string;
+  emailEnabled: boolean;
+  calendarEnabled: boolean;
+}
+
+export interface UpdateNotificationPreferenceRequest {
+  notificationType: string;
+  emailEnabled: boolean;
+  calendarEnabled: boolean;
+}
+
+export interface BulkUpdateNotificationPreferencesRequest {
+  preferences: UpdateNotificationPreferenceRequest[];
+}
+
+export interface IntegrationSettings {
+  providerType: string;
+  isConfigured: boolean;
+  isValid: boolean;
+  lastValidated?: string;
+}
+
+export interface MicrosoftGraphSettings {
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  sharedMailbox: string;
+  sharedCalendarId: string;
+  teamsWebhookUrl?: string;
+}
+
+export interface UpdateMicrosoftGraphSettingsRequest {
+  tenantId: string;
+  clientId: string;
+  clientSecret: string;
+  sharedMailbox: string;
+  sharedCalendarId?: string;
+  teamsWebhookUrl?: string;
+}
+
+export interface TestEmailRequest {
+  toEmail: string;
+}
+
+export interface TestCalendarEventRequest {
+  title?: string;
+  startTime?: string;
+  durationMinutes?: number;
+}
+
+export interface CalendarEventItem {
+  id: number;
+  externalEventId: string;
+  calendarType: string;
+  userId?: number;
+  userName?: string;
+  referenceType: string;
+  referenceId: number;
+  title: string;
+  startTime: string;
+  endTime: string;
+  providerType: string;
+  createdAt: string;
+}
+
+export interface NotificationStats {
+  pendingCount: number;
+  processingCount: number;
+  sentToday: number;
+  failedToday: number;
+  totalSent: number;
+  totalFailed: number;
+}
+
+export interface NotificationQueueFilter {
+  status?: string;
+  type?: string;
+  referenceType?: string;
+  referenceId?: number;
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface NotificationLogFilter {
+  success?: boolean;
+  type?: string;
+  channel?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface NotificationTypeInfo {
+  value: string;
+  displayName: string;
+  description: string;
+}
+
+export const NotificationTypes = [
+  'WorkOrderAssigned',
+  'WorkOrderApproachingDue',
+  'WorkOrderOverdue',
+  'WorkOrderCompleted',
+  'PMScheduleComingDue',
+  'PMScheduleOverdue',
+  'LowStockAlert'
+] as const;
+
+export const NotificationStatuses = ['Pending', 'Processing', 'Sent', 'Failed'] as const;
+export const NotificationChannels = ['Email', 'Calendar', 'Teams'] as const;
+
+// Licensing
+export const LicenseTiers = ['Basic', 'Pro', 'Enterprise'] as const;
+export type LicenseTier = typeof LicenseTiers[number];
+
+export const LicenseStatuses = ['Valid', 'GracePeriod', 'Expired', 'Revoked', 'NotActivated'] as const;
+export type LicenseStatus = typeof LicenseStatuses[number];
+
+export interface LicenseStatusInfo {
+  status: LicenseStatus;
+  tier: LicenseTier;
+  enabledFeatures: string[];
+  expiresAt: string | null;
+  lastPhoneHome: string | null;
+  daysUntilExpiry: number | null;
+  graceDaysRemaining: number | null;
+  warningMessage: string | null;
+  isActivated: boolean;
+}

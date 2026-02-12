@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import { store } from './store';
 import { ThemeContextProvider } from './contexts/ThemeContext';
+import { LicenseProvider } from './contexts/LicenseContext';
 import { useThemeMode } from './hooks/useThemeMode';
 import { Layout } from './components/common/Layout';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
@@ -42,6 +43,10 @@ import { TaskTemplatesPage } from './pages/admin/TaskTemplatesPage';
 import { TaskTemplateFormPage } from './pages/admin/TaskTemplateFormPage';
 import { BackupPage } from './pages/admin/BackupPage';
 import { DatabaseConfigPage } from './pages/admin/DatabaseConfigPage';
+import { IntegrationSettingsPage } from './pages/admin/IntegrationSettingsPage';
+import { NotificationQueuePage } from './pages/admin/NotificationQueuePage';
+import { NotificationPreferencesPage } from './pages/settings/NotificationPreferencesPage';
+import { LicensePage } from './pages/admin/LicensePage';
 import {
   ReportsPage,
   ReorderReportPage,
@@ -94,6 +99,7 @@ const ThemedApp: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
+        <LicenseProvider>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route
@@ -157,9 +163,16 @@ const ThemedApp: React.FC = () => {
                 <Route path="admin/help" element={<HelpPage />} />
                 <Route path="admin/backup" element={<BackupPage />} />
                 <Route path="admin/database" element={<DatabaseConfigPage />} />
+                <Route path="admin/integrations" element={<IntegrationSettingsPage />} />
+                <Route path="admin/notification-queue" element={<NotificationQueuePage />} />
+                <Route path="admin/license" element={<LicensePage />} />
+
+                {/* Settings Routes */}
+                <Route path="settings/notifications" element={<NotificationPreferencesPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+        </LicenseProvider>
           </BrowserRouter>
     </ThemeProvider>
   );

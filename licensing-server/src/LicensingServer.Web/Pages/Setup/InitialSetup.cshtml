@@ -1,0 +1,279 @@
+@page
+@model LicensingServer.Web.Pages.Setup.InitialSetupModel
+@{
+    ViewData["Title"] = "Initial Setup";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CMMS Licensing - Initial Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        body { background-color: #212529; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .setup-card { max-width: 550px; width: 100%; }
+        .step-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+        .step-dot { width: 12px; height: 12px; border-radius: 50%; background-color: #6c757d; }
+        .step-dot.active { background-color: #0d6efd; }
+        .step-dot.complete { background-color: #198754; }
+        .recovery-code { font-family: 'Courier New', monospace; font-size: 1.1rem; padding: 4px 8px; background: #f8f9fa; border-radius: 4px; display: inline-block; margin: 4px; }
+        .qr-container { text-align: center; padding: 16px; background: white; border-radius: 8px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="setup-card">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <div class="text-center mb-3">
+                    <i class="bi bi-shield-lock text-primary" style="font-size: 2.5rem;"></i>
+                    <h4 class="mt-2">CMMS Licensing - Setup</h4>
+                </div>
+
+                <div class="step-indicator">
+                    <div class="step-dot @(Model.Step >= 1 ? (Model.Step > 1 ? "complete" : "active") : "")"></div>
+                    <div class="step-dot @(Model.Step >= 2 ? (Model.Step > 2 ? "complete" : "active") : "")"></div>
+                    <div class="step-dot @(Model.Step >= 3 ? "active" : "")"></div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle me-1"></i> @Model.ErrorMessage
+                    </div>
+                }
+
+                @* Step 1: Create Account *@
+                @if (Model.Step == 1)
+                {
+                    <h5 class="text-center mb-3">Create Admin Account</h5>
+                    <p class="text-muted text-center small">This is the first time you're running the licensing server. Create your admin account with a strong password.</p>
+
+                    <form method="post" asp-page-handler="CreateAccount">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="Username"
+                                   value="@Model.Username" required minlength="3" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="Email"
+                                   value="@Model.Email" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="Password"
+                                   required minlength="12" />
+                            <div class="form-text">Min 12 chars with uppercase, lowercase, number, and special character.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="ConfirmPassword" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Next: Setup MFA <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+                    </form>
+                }
+
+                @* Step 2: Setup TOTP *@
+                @if (Model.Step == 2)
+                {
+                    <h5 class="text-center mb-3">Setup Authenticator App</h5>
+                    <p class="text-muted text-center small">Scan this QR code with your authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc.)</p>
+
+                    <div class="text-center mb-3">
+                        <div class="qr-container">
+                            <img src="data:image/png;base64,@Model.QrCodeBase64" alt="TOTP QR Code" style="width: 200px; height: 200px;" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Manual Entry Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace" value="@Model.TotpSecret" readonly id="totpSecret" />
+                            <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('totpSecret').value)">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <form method="post" asp-page-handler="VerifyTotp">
+                        <div class="mb-3">
+                            <label for="totpCode" class="form-label">Enter the 6-digit code from your app</label>
+                            <input type="text" class="form-control text-center font-monospace" id="totpCode" name="TotpCode"
+                                   maxlength="6" pattern="[0-9]{6}" required autofocus
+                                   style="font-size: 1.5rem; letter-spacing: 0.5rem;" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Verify & Create Account <i class="bi bi-check-lg ms-1"></i>
+                        </button>
+                    </form>
+                }
+
+                @* Step 3: Complete *@
+                @if (Model.Step == 3 && Model.SetupComplete)
+                {
+                    <h5 class="text-center mb-3 text-success">
+                        <i class="bi bi-check-circle me-1"></i> Setup Complete!
+                    </h5>
+
+                    @if (Model.RecoveryCodes != null && Model.RecoveryCodes.Count > 0)
+                    {
+                        <div class="alert alert-warning">
+                            <strong><i class="bi bi-exclamation-triangle me-1"></i> Save your recovery codes!</strong>
+                            <p class="mb-2 small">If you lose access to your authenticator app, use one of these codes to sign in. Each code can only be used once.</p>
+                            <div class="text-center">
+                                @foreach (var code in Model.RecoveryCodes)
+                                {
+                                    <span class="recovery-code">@code</span>
+                                }
+                            </div>
+                            <div class="mt-2 text-center">
+                                <button class="btn btn-sm btn-outline-dark" onclick="copyRecoveryCodes()">
+                                    <i class="bi bi-clipboard me-1"></i> Copy All
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <h6 class="mb-3">Optional: Register a Security Key (FIDO2)</h6>
+                    <p class="text-muted small">For stronger security, register a hardware security key (YubiKey, etc.) as an additional MFA method.</p>
+
+                    <div id="fido2-section">
+                        <div class="mb-3">
+                            <label for="deviceName" class="form-label">Device Name</label>
+                            <input type="text" class="form-control" id="deviceName" placeholder="e.g., YubiKey 5C" />
+                        </div>
+                        <button class="btn btn-outline-primary w-100 mb-2" onclick="registerFido2()" id="fido2RegisterBtn">
+                            <i class="bi bi-key me-1"></i> Register Security Key
+                        </button>
+                        <div id="fido2-status" class="text-center small"></div>
+                    </div>
+
+                    <hr />
+
+                    <a href="/Login" class="btn btn-success w-100">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Proceed to Login
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <script>
+        @if (Model.RecoveryCodes != null)
+        {
+            <text>
+            function copyRecoveryCodes() {
+                var codes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RecoveryCodes));
+                navigator.clipboard.writeText(codes.join('\n'));
+                alert('Recovery codes copied to clipboard!');
+            }
+            </text>
+        }
+
+        async function registerFido2() {
+            const btn = document.getElementById('fido2RegisterBtn');
+            const status = document.getElementById('fido2-status');
+            const deviceName = document.getElementById('deviceName').value || 'Security Key';
+
+            btn.disabled = true;
+            status.innerHTML = '<span class="text-info">Touch your security key when it flashes...</span>';
+
+            try {
+                // Get registration options
+                const optionsResponse = await fetch('/Setup/InitialSetup?handler=Fido2Options', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': getAntiForgeryToken()
+                    }
+                });
+                const options = await optionsResponse.json();
+
+                // Convert base64url to ArrayBuffer
+                options.challenge = base64urlToBuffer(options.challenge);
+                options.user.id = base64urlToBuffer(options.user.id);
+                if (options.excludeCredentials) {
+                    options.excludeCredentials = options.excludeCredentials.map(c => ({
+                        ...c,
+                        id: base64urlToBuffer(c.id)
+                    }));
+                }
+
+                // Create credential
+                const credential = await navigator.credentials.create({ publicKey: options });
+
+                // Send to server
+                const attestationResponse = {
+                    id: credential.id,
+                    rawId: bufferToBase64url(credential.rawId),
+                    type: credential.type,
+                    response: {
+                        attestationObject: bufferToBase64url(credential.response.attestationObject),
+                        clientDataJSON: bufferToBase64url(credential.response.clientDataJSON)
+                    },
+                    extensions: credential.getClientExtensionResults()
+                };
+
+                const regResponse = await fetch('/Setup/InitialSetup?handler=Fido2Register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': getAntiForgeryToken()
+                    },
+                    body: JSON.stringify({
+                        attestationResponse: attestationResponse,
+                        deviceName: deviceName
+                    })
+                });
+
+                if (regResponse.ok) {
+                    status.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Security key registered successfully!</span>';
+                    btn.textContent = 'Register Another Key';
+                    btn.disabled = false;
+                } else {
+                    const err = await regResponse.json();
+                    status.innerHTML = `<span class="text-danger">Registration failed: ${err.error || 'Unknown error'}</span>`;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                if (err.name === 'NotAllowedError') {
+                    status.innerHTML = '<span class="text-warning">Registration cancelled or timed out.</span>';
+                } else {
+                    status.innerHTML = `<span class="text-danger">Error: ${err.message}</span>`;
+                }
+                btn.disabled = false;
+            }
+        }
+
+        function getAntiForgeryToken() {
+            const input = document.querySelector('input[name="__RequestVerificationToken"]');
+            return input ? input.value : '';
+        }
+
+        function base64urlToBuffer(base64url) {
+            const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+            const pad = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4));
+            const binary = atob(base64 + pad);
+            const buffer = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) buffer[i] = binary.charCodeAt(i);
+            return buffer.buffer;
+        }
+
+        function bufferToBase64url(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+            return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

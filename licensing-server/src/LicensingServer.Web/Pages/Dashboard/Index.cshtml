@@ -1,0 +1,121 @@
+@page
+@model LicensingServer.Web.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted">Customers</h6>
+                        <h3>@Model.Dashboard.TotalCustomers</h3>
+                    </div>
+                    <i class="bi bi-building fs-1 text-primary opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted">Active Licenses</h6>
+                        <h3>@Model.Dashboard.ActiveLicenses</h3>
+                    </div>
+                    <i class="bi bi-key fs-1 text-success opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted">Activations</h6>
+                        <h3>@Model.Dashboard.ActiveActivations</h3>
+                    </div>
+                    <i class="bi bi-pc-display fs-1 text-primary opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted">Expiring Soon</h6>
+                        <h3>@Model.Dashboard.ExpiringSoon</h3>
+                    </div>
+                    <i class="bi bi-exclamation-triangle fs-1 text-warning opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Licenses by Tier</h6></div>
+            <div class="card-body">
+                @if (Model.Dashboard.LicensesByTier.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var tier in Model.Dashboard.LicensesByTier)
+                        {
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>
+                                    @if (tier.Key == "Enterprise") { <span class="badge bg-danger">@tier.Key</span> }
+                                    else if (tier.Key == "Pro") { <span class="badge bg-primary">@tier.Key</span> }
+                                    else { <span class="badge bg-secondary">@tier.Key</span> }
+                                </span>
+                                <strong>@tier.Value</strong>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No active licenses yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">Recent Activity</h6></div>
+            <div class="card-body p-0">
+                @if (Model.Dashboard.RecentActivity.Any())
+                {
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr><th>Action</th><th>Details</th><th>Time</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Dashboard.RecentActivity)
+                            {
+                                <tr>
+                                    <td><span class="badge bg-info">@item.Action</span></td>
+                                    <td>@item.Details</td>
+                                    <td class="text-muted">@item.Timestamp.ToString("g")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted p-3 mb-0">No activity yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

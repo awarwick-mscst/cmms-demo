@@ -1,3 +1,4 @@
+using CMMS.API.Attributes;
 using CMMS.Core.Entities;
 using CMMS.Core.Interfaces;
 using CMMS.Shared.DTOs;
@@ -9,6 +10,7 @@ namespace CMMS.API.Controllers;
 [ApiController]
 [Route("api/v1/label-templates")]
 [Authorize]
+[RequiresFeature("label-printing")]
 public class LabelTemplatesController : ControllerBase
 {
     private readonly ILabelService _labelService;

@@ -1,0 +1,81 @@
+@page
+@model LicensingServer.Web.Pages.Licenses.CreateModel
+@{
+    ViewData["Title"] = "Generate License";
+}
+
+<h2 class="mb-4">Generate License</h2>
+
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Form.CustomerId" class="form-label"></label>
+                <select asp-for="Form.CustomerId" asp-items="Model.Customers" class="form-select">
+                    <option value="">Select a customer...</option>
+                </select>
+                <span asp-validation-for="Form.CustomerId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.Tier" class="form-label"></label>
+                <select asp-for="Form.Tier" class="form-select">
+                    @foreach (var tier in Model.Tiers)
+                    {
+                        <option value="@tier">@tier</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.MaxActivations" class="form-label"></label>
+                <input asp-for="Form.MaxActivations" class="form-control" type="number" min="1" max="100" />
+                <span asp-validation-for="Form.MaxActivations" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.DurationMonths" class="form-label"></label>
+                <select asp-for="Form.DurationMonths" class="form-select">
+                    <option value="1">1 month</option>
+                    <option value="3">3 months</option>
+                    <option value="6">6 months</option>
+                    <option value="12" selected>12 months</option>
+                    <option value="24">24 months</option>
+                    <option value="36">36 months</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.Notes" class="form-label"></label>
+                <textarea asp-for="Form.Notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Generate License Key</button>
+                <a href="/Licenses" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4" style="max-width: 600px;">
+    <div class="card-header"><h6 class="mb-0">Tier Features</h6></div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr><th>Feature</th><th class="text-center">Basic</th><th class="text-center">Pro</th><th class="text-center">Enterprise</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Work Orders & Assets</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>Inventory Management</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>Preventive Maintenance</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>Advanced Reporting</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>Label Printing</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>LDAP Integration</td><td class="text-center text-muted">-</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>Email/Calendar</td><td class="text-center text-muted">-</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>Backup Management</td><td class="text-center text-muted">-</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+                <tr><td>API Access</td><td class="text-center text-muted">-</td><td class="text-center text-muted">-</td><td class="text-center text-success"><i class="bi bi-check-lg"></i></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>

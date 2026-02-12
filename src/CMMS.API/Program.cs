@@ -6,6 +6,7 @@ using CMMS.Core.Interfaces;
 using CMMS.Infrastructure.Data;
 using CMMS.Infrastructure.Repositories;
 using CMMS.Infrastructure.Services;
+using CMMS.Infrastructure.Services.Providers;
 using CMMS.Shared.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -69,6 +70,57 @@ builder.Services.AddSingleton<IDatabaseConfigService>(sp =>
     var logger = sp.GetRequiredService<ILogger<DatabaseConfigService>>();
     return new DatabaseConfigService(logger);
 });
+
+// Configure Licensing settings
+builder.Services.Configure<LicensingSettings>(builder.Configuration.GetSection(LicensingSettings.SectionName));
+var licensingSettings = builder.Configuration.GetSection(LicensingSettings.SectionName).Get<LicensingSettings>() ?? new LicensingSettings();
+
+if (licensingSettings.Enabled)
+{
+    builder.Services.AddHttpClient("LicenseServer", client =>
+    {
+        client.BaseAddress = new Uri(licensingSettings.LicenseServerUrl);
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+    builder.Services.AddScoped<ILicenseService, LicenseService>();
+    builder.Services.AddHostedService<LicensePhoneHomeService>();
+    Log.Information("Licensing system enabled - Server: {Url}", licensingSettings.LicenseServerUrl);
+}
+else
+{
+    builder.Services.AddSingleton<ILicenseService, UnlicensedModeService>();
+    Log.Information("Licensing system disabled - all features unlocked");
+}
+
+// Configure Email/Calendar settings
+builder.Services.Configure<EmailCalendarSettings>(builder.Configuration.GetSection(EmailCalendarSettings.SectionName));
+var emailCalendarSettings = builder.Configuration.GetSection(EmailCalendarSettings.SectionName).Get<EmailCalendarSettings>() ?? new EmailCalendarSettings();
+
+// Register HttpClientFactory for Teams and other HTTP-based providers
+builder.Services.AddHttpClient("Teams", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+// Register notification and calendar services
+builder.Services.AddScoped<IIntegrationSettingsService, IntegrationSettingsService>();
+builder.Services.AddScoped<IEmailProvider, MicrosoftGraphEmailProvider>();
+builder.Services.AddScoped<ICalendarProvider, MicrosoftGraphCalendarProvider>();
+builder.Services.AddScoped<ITeamsProvider, MicrosoftGraphTeamsProvider>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICalendarSyncService, CalendarSyncService>();
+
+// Register background services for notifications
+if (emailCalendarSettings.Enabled)
+{
+    builder.Services.AddHostedService<NotificationBackgroundService>();
+    builder.Services.AddHostedService<NotificationSchedulerService>();
+    Log.Information("Notification system enabled - Background services registered");
+}
+else
+{
+    Log.Information("Notification system disabled");
+}
 
 // Configure LDAP settings
 builder.Services.Configure<LdapSettings>(builder.Configuration.GetSection(LdapSettings.SectionName));
@@ -359,6 +411,7 @@ app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<LicenseValidationMiddleware>();
 app.MapControllers();
 
 app.Run();

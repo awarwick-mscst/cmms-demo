@@ -1,3 +1,4 @@
+using CMMS.API.Attributes;
 using CMMS.Core.Entities;
 using CMMS.Core.Enums;
 using CMMS.Core.Interfaces;
@@ -10,6 +11,7 @@ namespace CMMS.API.Controllers;
 [ApiController]
 [Route("api/v1/preventive-maintenance")]
 [Authorize]
+[RequiresFeature("preventive-maintenance")]
 public class PreventiveMaintenanceController : ControllerBase
 {
     private readonly IPreventiveMaintenanceService _pmService;

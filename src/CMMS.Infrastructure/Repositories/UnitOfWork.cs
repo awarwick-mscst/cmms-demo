@@ -40,6 +40,12 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<LabelTemplate>? _labelTemplates;
     private IRepository<LabelPrinter>? _labelPrinters;
     private IRepository<Attachment>? _attachments;
+    private IRepository<NotificationQueue>? _notificationQueue;
+    private IRepository<NotificationLog>? _notificationLogs;
+    private IRepository<UserNotificationPreference>? _userNotificationPreferences;
+    private IRepository<IntegrationSetting>? _integrationSettings;
+    private IRepository<CalendarEvent>? _calendarEvents;
+    private IRepository<LicenseInfo>? _licenseInfos;
 
     public UnitOfWork(CmmsDbContext context)
     {
@@ -76,6 +82,12 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<LabelTemplate> LabelTemplates => _labelTemplates ??= new Repository<LabelTemplate>(_context);
     public IRepository<LabelPrinter> LabelPrinters => _labelPrinters ??= new Repository<LabelPrinter>(_context);
     public IRepository<Attachment> Attachments => _attachments ??= new Repository<Attachment>(_context);
+    public IRepository<NotificationQueue> NotificationQueue => _notificationQueue ??= new Repository<NotificationQueue>(_context);
+    public IRepository<NotificationLog> NotificationLogs => _notificationLogs ??= new Repository<NotificationLog>(_context);
+    public IRepository<UserNotificationPreference> UserNotificationPreferences => _userNotificationPreferences ??= new Repository<UserNotificationPreference>(_context);
+    public IRepository<IntegrationSetting> IntegrationSettings => _integrationSettings ??= new Repository<IntegrationSetting>(_context);
+    public IRepository<CalendarEvent> CalendarEvents => _calendarEvents ??= new Repository<CalendarEvent>(_context);
+    public IRepository<LicenseInfo> LicenseInfos => _licenseInfos ??= new Repository<LicenseInfo>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

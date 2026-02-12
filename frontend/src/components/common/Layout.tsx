@@ -48,11 +48,17 @@ import {
   QrCodeScanner as QrCodeScannerIcon,
   Backup as BackupIcon,
   Storage as StorageIcon,
+  Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  Email as EmailIcon,
+  Key as KeyIcon,
 } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
 import { useThemeMode } from '../../hooks/useThemeMode';
+import { useLicense } from '../../contexts/LicenseContext';
+import { LicenseWarningBanner } from './LicenseWarningBanner';
 import { workOrderService } from '../../services/workOrderService';
 
 const drawerWidth = 240;
@@ -62,6 +68,7 @@ interface MenuItem {
   icon: React.ReactNode;
   path?: string;
   children?: MenuItem[];
+  feature?: string;
 }
 
 const menuItems: MenuItem[] = [
@@ -76,12 +83,13 @@ const menuItems: MenuItem[] = [
     children: [
       { text: 'My Work', icon: <TimerIcon />, path: '/maintenance/my-work' },
       { text: 'Work Orders', icon: <WorkOrderIcon />, path: '/maintenance/work-orders' },
-      { text: 'PM Schedules', icon: <ScheduleIcon />, path: '/maintenance/pm-schedules' },
+      { text: 'PM Schedules', icon: <ScheduleIcon />, path: '/maintenance/pm-schedules', feature: 'preventive-maintenance' },
     ],
   },
   {
     text: 'Inventory',
     icon: <PartsIcon />,
+    feature: 'inventory',
     children: [
       { text: 'Receive', icon: <WarehouseIcon />, path: '/inventory/receive' },
       { text: 'Parts', icon: <PartsIcon />, path: '/inventory/parts' },
@@ -97,11 +105,21 @@ const menuItems: MenuItem[] = [
     children: [
       { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
       { text: 'Task Templates', icon: <ChecklistIcon />, path: '/admin/task-templates' },
-      { text: 'Label Printers', icon: <PrintIcon />, path: '/admin/printers' },
-      { text: 'Label Templates', icon: <LabelIcon />, path: '/admin/label-templates' },
-      { text: 'Backup', icon: <BackupIcon />, path: '/admin/backup' },
+      { text: 'Label Printers', icon: <PrintIcon />, path: '/admin/printers', feature: 'label-printing' },
+      { text: 'Label Templates', icon: <LabelIcon />, path: '/admin/label-templates', feature: 'label-printing' },
+      { text: 'Backup', icon: <BackupIcon />, path: '/admin/backup', feature: 'backup' },
       { text: 'Database', icon: <StorageIcon />, path: '/admin/database' },
+      { text: 'Integrations', icon: <EmailIcon />, path: '/admin/integrations', feature: 'email-calendar' },
+      { text: 'Notification Queue', icon: <NotificationsIcon />, path: '/admin/notification-queue', feature: 'email-calendar' },
+      { text: 'License', icon: <KeyIcon />, path: '/admin/license' },
       { text: 'Help', icon: <HelpIcon />, path: '/admin/help' },
+    ],
+  },
+  {
+    text: 'Settings',
+    icon: <SettingsIcon />,
+    children: [
+      { text: 'Notifications', icon: <NotificationsIcon />, path: '/settings/notifications' },
     ],
   },
 ];
@@ -111,12 +129,14 @@ export const Layout: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { resolvedMode, toggleMode } = useThemeMode();
+  const { isFeatureEnabled } = useLicense();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     Inventory: location.pathname.startsWith('/inventory'),
     Maintenance: location.pathname.startsWith('/maintenance'),
     Admin: location.pathname.startsWith('/admin'),
+    Settings: location.pathname.startsWith('/settings'),
   });
   const [elapsedTime, setElapsedTime] = useState(0);
 
@@ -173,6 +193,18 @@ export const Layout: React.FC = () => {
     logout();
   };
 
+  const visibleMenuItems = menuItems
+    .filter((item) => !item.feature || isFeatureEnabled(item.feature))
+    .map((item) => {
+      if (item.children) {
+        return {
+          ...item,
+          children: item.children.filter((child) => !child.feature || isFeatureEnabled(child.feature)),
+        };
+      }
+      return item;
+    });
+
   const drawer = (
     <div>
       <Toolbar>
@@ -182,7 +214,7 @@ export const Layout: React.FC = () => {
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
+        {visibleMenuItems.map((item) => (
           <React.Fragment key={item.text}>
             {item.children ? (
               <>
@@ -337,6 +369,7 @@ export const Layout: React.FC = () => {
           flexDirection: 'column',
         }}
       >
+        <LicenseWarningBanner />
         <Outlet />
       </Box>
     </Box>

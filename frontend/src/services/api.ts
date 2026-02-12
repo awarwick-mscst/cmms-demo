@@ -49,11 +49,20 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh and license expiry
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    // Handle license expiry (402 Payment Required)
+    if (error.response?.status === 402) {
+      // Dispatch a custom event so the LicenseContext can react
+      window.dispatchEvent(new CustomEvent('license-expired', {
+        detail: error.response.data,
+      }));
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

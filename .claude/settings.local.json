@@ -14,7 +14,12 @@
       "Bash(npx tsc:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln:*)",
+      "WebSearch",
+      "Bash(dotnet add package:*)",
+      "Bash(dotnet add:*)"
     ]
   }
 }

@@ -1,0 +1,48 @@
+@page
+@model LicensingServer.Web.Pages.Customers.CreateModel
+@{
+    ViewData["Title"] = "Add Customer";
+}
+
+<h2 class="mb-4">Add Customer</h2>
+
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display:none"></div>
+
+            <div class="mb-3">
+                <label asp-for="Form.CompanyName" class="form-label"></label>
+                <input asp-for="Form.CompanyName" class="form-control" />
+                <span asp-validation-for="Form.CompanyName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.ContactName" class="form-label"></label>
+                <input asp-for="Form.ContactName" class="form-control" />
+                <span asp-validation-for="Form.ContactName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.ContactEmail" class="form-label"></label>
+                <input asp-for="Form.ContactEmail" class="form-control" type="email" />
+                <span asp-validation-for="Form.ContactEmail" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.Phone" class="form-label"></label>
+                <input asp-for="Form.Phone" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.Notes" class="form-label"></label>
+                <textarea asp-for="Form.Notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create Customer</button>
+                <a href="/Customers" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

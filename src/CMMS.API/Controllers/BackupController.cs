@@ -1,4 +1,5 @@
 using System.Text.Json;
+using CMMS.API.Attributes;
 using CMMS.Core.Interfaces;
 using CMMS.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ namespace CMMS.API.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize(Policy = "CanManageUsers")] // Admin only
+[RequiresFeature("backup")]
 public class BackupController : ControllerBase
 {
     private readonly IBackupService _backupService;

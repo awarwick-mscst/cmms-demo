@@ -41,6 +41,16 @@ public interface IUnitOfWork : IDisposable
     // Attachments
     IRepository<Attachment> Attachments { get; }
 
+    // Notifications
+    IRepository<NotificationQueue> NotificationQueue { get; }
+    IRepository<NotificationLog> NotificationLogs { get; }
+    IRepository<UserNotificationPreference> UserNotificationPreferences { get; }
+    IRepository<IntegrationSetting> IntegrationSettings { get; }
+    IRepository<CalendarEvent> CalendarEvents { get; }
+
+    // Licensing
+    IRepository<LicenseInfo> LicenseInfos { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);
