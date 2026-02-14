@@ -116,6 +116,12 @@ public class LicenseValidationService
 
         var daysUntilExpiry = (license.ExpiresAt - DateTime.UtcNow).TotalDays;
 
+        // Query the latest active stable release for update info
+        var latestRelease = await _context.Releases
+            .Where(r => r.IsActive && r.Channel == "stable")
+            .OrderByDescending(r => r.PublishedAt)
+            .FirstOrDefaultAsync();
+
         return new PhoneHomeResult
         {
             Valid = true,
@@ -123,6 +129,7 @@ public class LicenseValidationService
             ExpiresAt = license.ExpiresAt,
             DaysUntilExpiry = (int)daysUntilExpiry,
             Warning = daysUntilExpiry <= 14 ? $"License expires in {(int)daysUntilExpiry} days." : null,
+            LatestRelease = latestRelease,
         };
     }
 
@@ -202,6 +209,7 @@ public class PhoneHomeResult
     public DateTime? ExpiresAt { get; set; }
     public int? DaysUntilExpiry { get; set; }
     public string? Warning { get; set; }
+    public Release? LatestRelease { get; set; }
 }
 
 public class LicenseStatusResult

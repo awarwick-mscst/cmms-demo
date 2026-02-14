@@ -52,6 +52,7 @@ import {
   Settings as SettingsIcon,
   Email as EmailIcon,
   Key as KeyIcon,
+  SmartToy as SmartToyIcon,
 } from '@mui/icons-material';
 import { Collapse } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -99,6 +100,7 @@ const menuItems: MenuItem[] = [
     ],
   },
   { text: 'Reports', icon: <ReportsIcon />, path: '/reports' },
+  { text: 'AI Assistant', icon: <SmartToyIcon />, path: '/ai', feature: 'ai-assistant' },
   {
     text: 'Admin',
     icon: <AdminIcon />,

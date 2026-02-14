@@ -42,4 +42,16 @@ public class LicensePhoneHomeResult
     public string? Error { get; set; }
     public string? Warning { get; set; }
     public int? DaysUntilExpiry { get; set; }
+    public UpdateInfo? AvailableUpdate { get; set; }
+}
+
+public class UpdateInfo
+{
+    public string Version { get; set; } = string.Empty;
+    public string DownloadUrl { get; set; } = string.Empty;
+    public string? ReleaseNotes { get; set; }
+    public long FileSizeBytes { get; set; }
+    public string Sha256Hash { get; set; } = string.Empty;
+    public bool IsRequired { get; set; }
+    public int ReleaseId { get; set; }
 }

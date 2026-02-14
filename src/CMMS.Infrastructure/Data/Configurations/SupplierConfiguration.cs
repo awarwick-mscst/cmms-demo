@@ -68,7 +68,7 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 
         builder.Property(s => s.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(s => s.UpdatedAt)
             .HasColumnName("updated_at");
@@ -88,10 +88,10 @@ public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 
         builder.HasIndex(s => s.Code)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0 AND [code] IS NOT NULL");
+            .HasFilter(SqlDialect.SoftDeleteAndNotNullFilter("code"));
 
         builder.HasIndex(s => s.Name)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasQueryFilter(s => !s.IsDeleted);
     }

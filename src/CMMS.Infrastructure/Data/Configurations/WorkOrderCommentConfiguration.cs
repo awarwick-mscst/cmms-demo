@@ -32,7 +32,7 @@ public class WorkOrderCommentConfiguration : IEntityTypeConfiguration<WorkOrderC
 
         builder.Property(c => c.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         // Relationships
         builder.HasOne(c => c.CreatedBy)

@@ -46,7 +46,7 @@ public class WorkOrderTaskConfiguration : IEntityTypeConfiguration<WorkOrderTask
 
         builder.Property(t => t.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         // Relationships
         builder.HasOne(t => t.WorkOrder)

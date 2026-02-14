@@ -12,11 +12,25 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
+// When running as a Windows Service, the working directory defaults to System32.
+// Set it to the exe's directory so config files and wwwroot are found correctly.
+if (WindowsServiceHelpers.IsWindowsService())
+{
+    Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+}
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Enable running as a Windows Service (no-op in console/dev mode)
+builder.Host.UseWindowsService(options =>
+{
+    options.ServiceName = "CmmsService";
+});
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -28,15 +42,34 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Add DbContext
+// Add DbContext with dynamic provider selection
+var dbSettings = builder.Configuration.GetSection(CMMS.Core.Configuration.DatabaseSettings.SectionName)
+    .Get<CMMS.Core.Configuration.DatabaseSettings>();
+var dbProvider = dbSettings?.Provider ?? CMMS.Core.Configuration.DatabaseProvider.SqlServer;
+SqlDialect.Provider = dbProvider;
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+
 builder.Services.AddDbContext<CmmsDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions =>
-        {
-            sqlOptions.EnableRetryOnFailure(3);
-            sqlOptions.CommandTimeout(30);
-        }));
+{
+    switch (dbProvider)
+    {
+        case CMMS.Core.Configuration.DatabaseProvider.PostgreSql:
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(3);
+                npgsqlOptions.CommandTimeout(30);
+            });
+            break;
+        default:
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(3);
+                sqlOptions.CommandTimeout(30);
+            });
+            break;
+    }
+});
 
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -70,6 +103,26 @@ builder.Services.AddSingleton<IDatabaseConfigService>(sp =>
     var logger = sp.GetRequiredService<ILogger<DatabaseConfigService>>();
     return new DatabaseConfigService(logger);
 });
+builder.Services.AddSingleton<IUpdateService, UpdateService>();
+
+// Configure AI Assistant settings
+builder.Services.Configure<AiAssistantSettings>(builder.Configuration.GetSection(AiAssistantSettings.SectionName));
+var aiSettings = builder.Configuration.GetSection(AiAssistantSettings.SectionName).Get<AiAssistantSettings>() ?? new AiAssistantSettings();
+
+if (aiSettings.Enabled)
+{
+    builder.Services.AddHttpClient("AiAssistant", client =>
+    {
+        client.BaseAddress = new Uri(aiSettings.BaseUrl.TrimEnd('/') + "/");
+        client.Timeout = TimeSpan.FromSeconds(aiSettings.TimeoutSeconds);
+    });
+    builder.Services.AddScoped<IAiAssistantService, AiAssistantService>();
+    Log.Information("AI Assistant enabled - Endpoint: {Url}, Model: {Model}", aiSettings.BaseUrl, aiSettings.Model);
+}
+else
+{
+    Log.Information("AI Assistant disabled");
+}
 
 // Configure Licensing settings
 builder.Services.Configure<LicensingSettings>(builder.Configuration.GetSection(LicensingSettings.SectionName));
@@ -350,6 +403,15 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Auto-migrate database in non-Development environments (production installs / updates)
+if (!app.Environment.IsDevelopment())
+{
+    using var migrationScope = app.Services.CreateScope();
+    var migrationDb = migrationScope.ServiceProvider.GetRequiredService<CmmsDbContext>();
+    migrationDb.Database.Migrate();
+    Log.Information("Database migrations applied successfully");
+}
+
 // Seed admin user if not exists
 using (var scope = app.Services.CreateScope())
 {
@@ -413,6 +475,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<LicenseValidationMiddleware>();
 app.MapControllers();
+
+// SPA fallback: serve index.html for any unmatched routes (embedded frontend)
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

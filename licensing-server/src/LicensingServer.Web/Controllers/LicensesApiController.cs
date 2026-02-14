@@ -62,17 +62,26 @@ public class LicensesApiController : ControllerBase
         if (!result.Valid)
             return BadRequest(new { success = false, error = result.Message });
 
-        return Ok(new
+        var data = new Dictionary<string, object?>
         {
-            success = true,
-            data = new
-            {
-                tier = result.Tier,
-                expiresAt = result.ExpiresAt,
-                daysUntilExpiry = result.DaysUntilExpiry,
-                warning = result.Warning,
-            }
-        });
+            ["tier"] = result.Tier,
+            ["expiresAt"] = result.ExpiresAt,
+            ["daysUntilExpiry"] = result.DaysUntilExpiry,
+            ["warning"] = result.Warning,
+        };
+
+        if (result.LatestRelease != null)
+        {
+            data["latestVersion"] = result.LatestRelease.Version;
+            data["downloadUrl"] = $"/api/v1/releases/{result.LatestRelease.Id}/download?licenseKey={request.LicenseKey}&hardwareId={request.HardwareId}";
+            data["releaseNotes"] = result.LatestRelease.ReleaseNotes;
+            data["fileSizeBytes"] = result.LatestRelease.FileSizeBytes;
+            data["sha256Hash"] = result.LatestRelease.Sha256Hash;
+            data["isRequired"] = result.LatestRelease.IsRequired;
+            data["releaseId"] = result.LatestRelease.Id;
+        }
+
+        return Ok(new { success = true, data });
     }
 
     [HttpGet("{id}/status")]

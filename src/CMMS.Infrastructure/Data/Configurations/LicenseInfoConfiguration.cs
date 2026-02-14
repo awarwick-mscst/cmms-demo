@@ -57,7 +57,7 @@ public class LicenseInfoConfiguration : IEntityTypeConfiguration<LicenseInfo>
 
         builder.Property(l => l.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(l => l.UpdatedAt)
             .HasColumnName("updated_at");

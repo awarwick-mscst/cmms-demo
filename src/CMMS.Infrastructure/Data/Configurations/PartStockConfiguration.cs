@@ -45,7 +45,7 @@ public class PartStockConfiguration : IEntityTypeConfiguration<PartStock>
 
         builder.Property(ps => ps.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(ps => ps.UpdatedAt)
             .HasColumnName("updated_at");
@@ -82,7 +82,7 @@ public class PartStockConfiguration : IEntityTypeConfiguration<PartStock>
 
         builder.HasIndex(ps => new { ps.PartId, ps.LocationId })
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(ps => ps.LocationId);
 

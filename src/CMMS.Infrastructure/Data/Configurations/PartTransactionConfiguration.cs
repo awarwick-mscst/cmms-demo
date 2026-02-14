@@ -54,14 +54,14 @@ public class PartTransactionConfiguration : IEntityTypeConfiguration<PartTransac
 
         builder.Property(pt => pt.TransactionDate)
             .HasColumnName("transaction_date")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(pt => pt.CreatedBy)
             .HasColumnName("created_by");
 
         builder.Property(pt => pt.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.HasOne(pt => pt.Part)
             .WithMany(p => p.Transactions)

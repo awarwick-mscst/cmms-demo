@@ -38,7 +38,7 @@ public class LabelTemplateConfiguration : IEntityTypeConfiguration<LabelTemplate
 
         builder.Property(t => t.ElementsJson)
             .HasColumnName("elements_json")
-            .HasColumnType("nvarchar(max)")
+            .HasColumnType(SqlDialect.UnboundedText())
             .IsRequired();
 
         builder.Property(t => t.IsDefault)
@@ -47,7 +47,7 @@ public class LabelTemplateConfiguration : IEntityTypeConfiguration<LabelTemplate
 
         builder.Property(t => t.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(t => t.UpdatedAt)
             .HasColumnName("updated_at");
@@ -67,10 +67,10 @@ public class LabelTemplateConfiguration : IEntityTypeConfiguration<LabelTemplate
 
         builder.HasIndex(t => t.Name)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(t => t.IsDefault)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasQueryFilter(t => !t.IsDeleted);
     }

@@ -32,7 +32,7 @@ public class AssetPartConfiguration : IEntityTypeConfiguration<AssetPart>
 
         builder.Property(ap => ap.UsedDate)
             .HasColumnName("used_date")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(ap => ap.UsedBy)
             .HasColumnName("used_by");
@@ -46,7 +46,7 @@ public class AssetPartConfiguration : IEntityTypeConfiguration<AssetPart>
 
         builder.Property(ap => ap.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Ignore(ap => ap.TotalCost);
 

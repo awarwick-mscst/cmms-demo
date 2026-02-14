@@ -92,7 +92,7 @@ public class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
         // Audit fields
         builder.Property(w => w.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(w => w.CreatedBy)
             .HasColumnName("created_by");
@@ -154,7 +154,7 @@ public class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
         // Indexes
         builder.HasIndex(w => w.WorkOrderNumber)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(w => w.Status);
         builder.HasIndex(w => w.Type);

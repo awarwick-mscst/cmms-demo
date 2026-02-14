@@ -37,7 +37,7 @@ public class WorkOrderHistoryConfiguration : IEntityTypeConfiguration<WorkOrderH
 
         builder.Property(h => h.ChangedAt)
             .HasColumnName("changed_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(h => h.Notes)
             .HasColumnName("notes")

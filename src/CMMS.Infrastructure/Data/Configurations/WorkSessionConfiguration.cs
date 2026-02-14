@@ -42,7 +42,7 @@ public class WorkSessionConfiguration : IEntityTypeConfiguration<WorkSession>
 
         builder.Property(ws => ws.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.HasOne(ws => ws.WorkOrder)
             .WithMany()
@@ -55,7 +55,7 @@ public class WorkSessionConfiguration : IEntityTypeConfiguration<WorkSession>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(ws => new { ws.UserId, ws.IsActive })
-            .HasFilter("[is_active] = 1");
+            .HasFilter(SqlDialect.BooleanTrueFilter("is_active"));
 
         builder.HasIndex(ws => new { ws.WorkOrderId, ws.IsActive });
     }

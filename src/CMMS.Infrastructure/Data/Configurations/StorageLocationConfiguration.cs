@@ -63,7 +63,7 @@ public class StorageLocationConfiguration : IEntityTypeConfiguration<StorageLoca
 
         builder.Property(sl => sl.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(sl => sl.UpdatedAt)
             .HasColumnName("updated_at");
@@ -88,7 +88,7 @@ public class StorageLocationConfiguration : IEntityTypeConfiguration<StorageLoca
 
         builder.HasIndex(sl => sl.Code)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0 AND [code] IS NOT NULL");
+            .HasFilter(SqlDialect.SoftDeleteAndNotNullFilter("code"));
 
         builder.HasIndex(sl => sl.ParentId);
 

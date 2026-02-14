@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,6 +20,7 @@ public class LicenseService : ILicenseService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IUpdateService _updateService;
     private readonly LicensingSettings _settings;
     private readonly ILogger<LicenseService> _logger;
 
@@ -31,11 +33,13 @@ public class LicenseService : ILicenseService
     public LicenseService(
         IUnitOfWork unitOfWork,
         IHttpClientFactory httpClientFactory,
+        IUpdateService updateService,
         IOptions<LicensingSettings> settings,
         ILogger<LicenseService> logger)
     {
         _unitOfWork = unitOfWork;
         _httpClientFactory = httpClientFactory;
+        _updateService = updateService;
         _settings = settings.Value;
         _logger = logger;
     }
@@ -272,11 +276,41 @@ public class LicenseService : ILicenseService
 
             _logger.LogInformation("Phone-home successful. Days until expiry: {Days}", daysUntilExpiry);
 
+            // Check for available update from phone-home response
+            UpdateInfo? availableUpdate = null;
+            if (data.TryGetProperty("latestVersion", out var latestVersionEl))
+            {
+                var latestVersion = latestVersionEl.GetString();
+                var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.0.0";
+
+                if (!string.IsNullOrEmpty(latestVersion) && IsNewerVersion(latestVersion, currentVersion))
+                {
+                    availableUpdate = new UpdateInfo
+                    {
+                        Version = latestVersion,
+                        DownloadUrl = data.TryGetProperty("downloadUrl", out var dl) ? dl.GetString() ?? "" : "",
+                        ReleaseNotes = data.TryGetProperty("releaseNotes", out var rn) ? rn.GetString() : null,
+                        FileSizeBytes = data.TryGetProperty("fileSizeBytes", out var fs) ? fs.GetInt64() : 0,
+                        Sha256Hash = data.TryGetProperty("sha256Hash", out var sh) ? sh.GetString() ?? "" : "",
+                        IsRequired = data.TryGetProperty("isRequired", out var ir) && ir.GetBoolean(),
+                        ReleaseId = data.TryGetProperty("releaseId", out var ri) ? ri.GetInt32() : 0,
+                    };
+
+                    _updateService.SetAvailableUpdate(availableUpdate);
+                    _logger.LogInformation("Update available: {Version}", latestVersion);
+                }
+                else
+                {
+                    _updateService.SetAvailableUpdate(null);
+                }
+            }
+
             return new LicensePhoneHomeResult
             {
                 Success = true,
                 DaysUntilExpiry = daysUntilExpiry,
                 Warning = warning,
+                AvailableUpdate = availableUpdate,
             };
         }
         catch (HttpRequestException ex)
@@ -369,6 +403,13 @@ public class LicenseService : ILicenseService
         }
 
         return LicenseStatus.Valid;
+    }
+
+    private static bool IsNewerVersion(string latest, string current)
+    {
+        if (Version.TryParse(latest, out var latestVer) && Version.TryParse(current, out var currentVer))
+            return latestVer > currentVer;
+        return false;
     }
 
     private static string GenerateHardwareId()

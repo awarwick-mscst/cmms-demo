@@ -32,7 +32,7 @@ public class UserNotificationPreferenceConfiguration : IEntityTypeConfiguration<
         // Audit fields
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(p => p.CreatedBy)
             .HasColumnName("created_by");
@@ -62,7 +62,7 @@ public class UserNotificationPreferenceConfiguration : IEntityTypeConfiguration<
 
         // Index
         builder.HasIndex(p => p.UserId)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         // Soft delete filter
         builder.HasQueryFilter(p => !p.IsDeleted);

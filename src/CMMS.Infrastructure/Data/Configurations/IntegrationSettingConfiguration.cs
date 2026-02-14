@@ -33,7 +33,7 @@ public class IntegrationSettingConfiguration : IEntityTypeConfiguration<Integrat
         // Audit fields
         builder.Property(s => s.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(s => s.CreatedBy)
             .HasColumnName("created_by");
@@ -57,7 +57,7 @@ public class IntegrationSettingConfiguration : IEntityTypeConfiguration<Integrat
 
         // Index
         builder.HasIndex(s => s.ProviderType)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         // Soft delete filter
         builder.HasQueryFilter(s => !s.IsDeleted);

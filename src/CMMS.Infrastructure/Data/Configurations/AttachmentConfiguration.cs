@@ -65,7 +65,7 @@ public class AttachmentConfiguration : IEntityTypeConfiguration<Attachment>
 
         builder.Property(a => a.UploadedAt)
             .HasColumnName("uploaded_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(a => a.UploadedBy)
             .HasColumnName("uploaded_by");
@@ -73,7 +73,7 @@ public class AttachmentConfiguration : IEntityTypeConfiguration<Attachment>
         // Audit fields
         builder.Property(a => a.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(a => a.CreatedBy)
             .HasColumnName("created_by");
@@ -99,7 +99,7 @@ public class AttachmentConfiguration : IEntityTypeConfiguration<Attachment>
 
         // Indexes
         builder.HasIndex(a => new { a.EntityType, a.EntityId })
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(a => a.AttachmentType);
 

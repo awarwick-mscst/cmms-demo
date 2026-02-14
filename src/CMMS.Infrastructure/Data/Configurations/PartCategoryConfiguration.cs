@@ -43,7 +43,7 @@ public class PartCategoryConfiguration : IEntityTypeConfiguration<PartCategory>
 
         builder.Property(pc => pc.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(pc => pc.UpdatedAt)
             .HasColumnName("updated_at");
@@ -68,7 +68,7 @@ public class PartCategoryConfiguration : IEntityTypeConfiguration<PartCategory>
 
         builder.HasIndex(pc => pc.Code)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0 AND [code] IS NOT NULL");
+            .HasFilter(SqlDialect.SoftDeleteAndNotNullFilter("code"));
 
         builder.HasIndex(pc => new { pc.ParentId, pc.SortOrder });
 

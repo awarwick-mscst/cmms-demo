@@ -176,8 +176,7 @@ public class DatabaseConfigController : ControllerBase
                 DefaultPort = 5432,
                 SupportsWindowsAuth = false,
                 RequiresFilePath = false,
-                IsSupported = false,
-                NotSupportedReason = "PostgreSQL support is planned for a future release"
+                IsSupported = true
             },
             new()
             {

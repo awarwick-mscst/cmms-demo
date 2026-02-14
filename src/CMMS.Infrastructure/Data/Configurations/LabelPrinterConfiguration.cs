@@ -66,7 +66,7 @@ public class LabelPrinterConfiguration : IEntityTypeConfiguration<LabelPrinter>
 
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(p => p.UpdatedAt)
             .HasColumnName("updated_at");
@@ -80,13 +80,13 @@ public class LabelPrinterConfiguration : IEntityTypeConfiguration<LabelPrinter>
 
         builder.HasIndex(p => p.Name)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(p => p.IsActive)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(p => p.IsDefault)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasQueryFilter(p => !p.IsDeleted);
     }

@@ -56,7 +56,7 @@ public class CalendarEventConfiguration : IEntityTypeConfiguration<CalendarEvent
         // Audit fields
         builder.Property(e => e.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(e => e.CreatedBy)
             .HasColumnName("created_by");
@@ -82,13 +82,13 @@ public class CalendarEventConfiguration : IEntityTypeConfiguration<CalendarEvent
 
         // Indexes
         builder.HasIndex(e => e.ExternalEventId)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(e => new { e.ReferenceType, e.ReferenceId })
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(e => e.UserId)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         // Soft delete filter
         builder.HasQueryFilter(e => !e.IsDeleted);

@@ -51,6 +51,10 @@ public interface IUnitOfWork : IDisposable
     // Licensing
     IRepository<LicenseInfo> LicenseInfos { get; }
 
+    // AI Assistant
+    IRepository<AiConversation> AiConversations { get; }
+    IRepository<AiMessage> AiMessages { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);

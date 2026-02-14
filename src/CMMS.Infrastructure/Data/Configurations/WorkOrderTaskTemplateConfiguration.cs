@@ -29,7 +29,7 @@ public class WorkOrderTaskTemplateConfiguration : IEntityTypeConfiguration<WorkO
         // Audit fields
         builder.Property(t => t.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(t => t.CreatedBy)
             .HasColumnName("created_by");

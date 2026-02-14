@@ -1,4 +1,5 @@
 using System.Text.Json;
+using CMMS.Core.Configuration;
 using CMMS.Core.Interfaces;
 using CMMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +78,7 @@ public class BackupService : IBackupService
                     Version = "1.0",
                     ExportedAt = DateTime.UtcNow,
                     AppVersion = "1.0.0",
-                    SourceDatabase = "MSSQL",
+                    SourceDatabase = SqlDialect.Provider == DatabaseProvider.PostgreSql ? "PostgreSQL" : "MSSQL",
                     RecordCounts = new Dictionary<string, int>()
                 },
                 Schema = new BackupSchema
@@ -135,7 +136,7 @@ public class BackupService : IBackupService
         CancellationToken cancellationToken)
     {
         var schemaTable = GetSchemaAndTable(tableName);
-        var sql = $"SELECT * FROM [{schemaTable.schema}].[{schemaTable.table}]";
+        var sql = $"SELECT * FROM {SqlDialect.QuoteSchemaTable(schemaTable.schema, schemaTable.table)}";
 
         var results = new List<Dictionary<string, object?>>();
 
@@ -284,7 +285,7 @@ public class BackupService : IBackupService
     private async Task ClearTableAsync(string tableName, CancellationToken cancellationToken)
     {
         var schemaTable = GetSchemaAndTable(tableName);
-        var sql = $"DELETE FROM [{schemaTable.schema}].[{schemaTable.table}]";
+        var sql = $"DELETE FROM {SqlDialect.QuoteSchemaTable(schemaTable.schema, schemaTable.table)}";
         await _context.Database.ExecuteSqlRawAsync(sql, cancellationToken);
     }
 
@@ -296,16 +297,16 @@ public class BackupService : IBackupService
         if (!data.Any()) return 0;
 
         var schemaTable = GetSchemaAndTable(tableName);
-        var fullTableName = $"[{schemaTable.schema}].[{schemaTable.table}]";
+        var fullTableName = SqlDialect.QuoteSchemaTable(schemaTable.schema, schemaTable.table);
 
-        // Check if table has identity column
+        // Check if table has identity/serial column
         var hasIdentity = await HasIdentityColumnAsync(schemaTable.schema, schemaTable.table, cancellationToken);
 
         var count = 0;
 
         try
         {
-            if (hasIdentity)
+            if (hasIdentity && SqlDialect.Provider != DatabaseProvider.PostgreSql)
             {
                 await _context.Database.ExecuteSqlRawAsync(
                     $"SET IDENTITY_INSERT {fullTableName} ON", cancellationToken);
@@ -314,25 +315,46 @@ public class BackupService : IBackupService
             foreach (var row in data)
             {
                 var columns = row.Keys.ToList();
-                var columnList = string.Join(", ", columns.Select(c => $"[{c}]"));
+                var columnList = string.Join(", ", columns.Select(c => SqlDialect.QuoteIdentifier(c)));
                 var paramList = string.Join(", ", columns.Select((_, i) => $"@p{i}"));
 
                 var sql = $"INSERT INTO {fullTableName} ({columnList}) VALUES ({paramList})";
 
-                var parameters = columns.Select((col, i) =>
-                {
-                    var value = row[col];
-                    var param = new Microsoft.Data.SqlClient.SqlParameter($"@p{i}", value ?? DBNull.Value);
-                    return param;
-                }).ToArray();
+                using var command = _context.Database.GetDbConnection().CreateCommand();
+                command.CommandText = sql;
 
-                await _context.Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    var param = command.CreateParameter();
+                    param.ParameterName = $"@p{i}";
+                    param.Value = row[columns[i]] ?? DBNull.Value;
+                    command.Parameters.Add(param);
+                }
+
+                await _context.Database.OpenConnectionAsync(cancellationToken);
+                await command.ExecuteNonQueryAsync(cancellationToken);
                 count++;
+            }
+
+            // For PostgreSQL, reset sequences after bulk insert
+            if (hasIdentity && SqlDialect.Provider == DatabaseProvider.PostgreSql)
+            {
+                var resetSql = $@"
+                    SELECT setval(pg_get_serial_sequence('{schemaTable.schema}.{schemaTable.table}', 'id'),
+                           COALESCE((SELECT MAX(id) FROM {fullTableName}), 0) + 1, false)";
+                try
+                {
+                    await _context.Database.ExecuteSqlRawAsync(resetSql, cancellationToken);
+                }
+                catch
+                {
+                    // Sequence may not exist if column uses GENERATED ALWAYS
+                }
             }
         }
         finally
         {
-            if (hasIdentity)
+            if (hasIdentity && SqlDialect.Provider != DatabaseProvider.PostgreSql)
             {
                 await _context.Database.ExecuteSqlRawAsync(
                     $"SET IDENTITY_INSERT {fullTableName} OFF", cancellationToken);
@@ -344,17 +366,37 @@ public class BackupService : IBackupService
 
     private async Task<bool> HasIdentityColumnAsync(string schema, string table, CancellationToken cancellationToken)
     {
-        var sql = @"
-            SELECT COUNT(*)
-            FROM sys.columns c
-            JOIN sys.tables t ON c.object_id = t.object_id
-            JOIN sys.schemas s ON t.schema_id = s.schema_id
-            WHERE s.name = @schema AND t.name = @table AND c.is_identity = 1";
+        string sql;
+        if (SqlDialect.Provider == DatabaseProvider.PostgreSql)
+        {
+            sql = @"
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = @schema AND table_name = @table
+                  AND (column_default LIKE 'nextval%' OR is_identity = 'YES')";
+        }
+        else
+        {
+            sql = @"
+                SELECT COUNT(*)
+                FROM sys.columns c
+                JOIN sys.tables t ON c.object_id = t.object_id
+                JOIN sys.schemas s ON t.schema_id = s.schema_id
+                WHERE s.name = @schema AND t.name = @table AND c.is_identity = 1";
+        }
 
         using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = sql;
-        command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@schema", schema));
-        command.Parameters.Add(new Microsoft.Data.SqlClient.SqlParameter("@table", table));
+
+        var schemaParam = command.CreateParameter();
+        schemaParam.ParameterName = "@schema";
+        schemaParam.Value = schema;
+        command.Parameters.Add(schemaParam);
+
+        var tableParam = command.CreateParameter();
+        tableParam.ParameterName = "@table";
+        tableParam.Value = table;
+        command.Parameters.Add(tableParam);
 
         await _context.Database.OpenConnectionAsync(cancellationToken);
         try

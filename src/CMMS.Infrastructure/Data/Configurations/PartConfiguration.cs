@@ -77,7 +77,7 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
 
         builder.Property(p => p.Specifications)
             .HasColumnName("specifications")
-            .HasColumnType("nvarchar(max)");
+            .HasColumnType(SqlDialect.UnboundedText());
 
         builder.Property(p => p.Manufacturer)
             .HasColumnName("manufacturer")
@@ -101,7 +101,7 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
 
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(p => p.UpdatedAt)
             .HasColumnName("updated_at");
@@ -131,11 +131,11 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
 
         builder.HasIndex(p => p.PartNumber)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(p => p.Barcode)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0 AND [barcode] IS NOT NULL");
+            .HasFilter(SqlDialect.SoftDeleteAndNotNullFilter("barcode"));
 
         builder.HasIndex(p => p.CategoryId);
         builder.HasIndex(p => p.SupplierId);

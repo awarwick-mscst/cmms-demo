@@ -45,7 +45,7 @@ public class AssetCategoryConfiguration : IEntityTypeConfiguration<AssetCategory
 
         builder.Property(ac => ac.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(ac => ac.UpdatedAt)
             .HasColumnName("updated_at");
@@ -70,7 +70,7 @@ public class AssetCategoryConfiguration : IEntityTypeConfiguration<AssetCategory
 
         builder.HasIndex(ac => ac.Code)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasQueryFilter(ac => !ac.IsDeleted);
     }
@@ -136,7 +136,7 @@ public class AssetLocationConfiguration : IEntityTypeConfiguration<AssetLocation
 
         builder.Property(al => al.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(al => al.UpdatedAt)
             .HasColumnName("updated_at");
@@ -161,7 +161,7 @@ public class AssetLocationConfiguration : IEntityTypeConfiguration<AssetLocation
 
         builder.HasIndex(al => al.Code)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasQueryFilter(al => !al.IsDeleted);
     }
@@ -264,7 +264,7 @@ public class AssetConfiguration : IEntityTypeConfiguration<Asset>
 
         builder.Property(a => a.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(a => a.UpdatedAt)
             .HasColumnName("updated_at");
@@ -304,11 +304,11 @@ public class AssetConfiguration : IEntityTypeConfiguration<Asset>
 
         builder.HasIndex(a => a.AssetTag)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(a => a.Barcode)
             .IsUnique()
-            .HasFilter("[is_deleted] = 0 AND [barcode] IS NOT NULL");
+            .HasFilter(SqlDialect.SoftDeleteAndNotNullFilter("barcode"));
 
         builder.HasQueryFilter(a => !a.IsDeleted);
     }
@@ -360,7 +360,7 @@ public class AssetDocumentConfiguration : IEntityTypeConfiguration<AssetDocument
 
         builder.Property(ad => ad.UploadedAt)
             .HasColumnName("uploaded_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(ad => ad.UploadedBy)
             .HasColumnName("uploaded_by");

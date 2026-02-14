@@ -58,6 +58,7 @@ import {
   WorkOrderSummaryPage,
 } from './pages/reports';
 import { ScannerPage } from './pages/ScannerPage';
+import { AiAssistantPage } from './pages/ai/AiAssistantPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,6 +139,9 @@ const ThemedApp: React.FC = () => {
                 <Route path="maintenance/pm-schedules" element={<PreventiveMaintenancePage />} />
                 <Route path="maintenance/pm-schedules/new" element={<PMScheduleFormPage />} />
                 <Route path="maintenance/pm-schedules/:id/edit" element={<PMScheduleFormPage />} />
+
+                {/* AI Assistant */}
+                <Route path="ai" element={<AiAssistantPage />} />
 
                 {/* Reports Routes */}
                 <Route path="reports" element={<ReportsPage />} />

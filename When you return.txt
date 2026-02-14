@@ -1,11 +1,18 @@
   When you return, to start the system:
 
-  1. API (Terminal 1):
+
+  1. Start the licensing server
+  cd C:\Users\aaron\source\claude\demo\licensing-server\src\LicensingServer.Web
+  dotnet run
+  Best to wait 30 seconds before starting rest of app.
+  2. API (Terminal 1):
   cd C:\Users\aaron\source\claude\demo\src\CMMS.API
   dotnet run
-  2. Frontend (Terminal 2):
+  3. Frontend (Terminal 2):
   cd C:\Users\aaron\source\claude\demo\frontend
   npm start
-  3. Open http://fragbox:3000 and login with admin / Admin@123
+  4. Open http://fragbox:3000 and login with admin / Admin@123
 
   See you tomorrow!
+
+  

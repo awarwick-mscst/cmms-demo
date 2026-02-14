@@ -1453,3 +1453,41 @@ export interface LicenseStatusInfo {
   warningMessage: string | null;
   isActivated: boolean;
 }
+
+// AI Assistant
+export interface AiConversation {
+  id: number;
+  title: string;
+  summary: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface AiConversationDetail {
+  id: number;
+  title: string;
+  summary: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+  messages: AiMessage[];
+}
+
+export interface AiMessage {
+  id: number;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  contextType: string | null;
+  createdAt: string;
+}
+
+export interface AiStatus {
+  enabled: boolean;
+  reachable: boolean;
+  model: string | null;
+}
+
+export interface SendMessageRequest {
+  message: string;
+  contextType?: string;
+  assetId?: number;
+}

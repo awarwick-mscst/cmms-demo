@@ -44,7 +44,7 @@ public class NotificationLogConfiguration : IEntityTypeConfiguration<Notificatio
 
         builder.Property(n => n.SentAt)
             .HasColumnName("sent_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(n => n.QueueId)
             .HasColumnName("queue_id");
@@ -58,7 +58,7 @@ public class NotificationLogConfiguration : IEntityTypeConfiguration<Notificatio
 
         builder.Property(n => n.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         // Relationships
         builder.HasOne(n => n.Queue)

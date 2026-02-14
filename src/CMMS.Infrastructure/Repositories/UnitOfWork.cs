@@ -46,6 +46,8 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<IntegrationSetting>? _integrationSettings;
     private IRepository<CalendarEvent>? _calendarEvents;
     private IRepository<LicenseInfo>? _licenseInfos;
+    private IRepository<AiConversation>? _aiConversations;
+    private IRepository<AiMessage>? _aiMessages;
 
     public UnitOfWork(CmmsDbContext context)
     {
@@ -88,6 +90,8 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<IntegrationSetting> IntegrationSettings => _integrationSettings ??= new Repository<IntegrationSetting>(_context);
     public IRepository<CalendarEvent> CalendarEvents => _calendarEvents ??= new Repository<CalendarEvent>(_context);
     public IRepository<LicenseInfo> LicenseInfos => _licenseInfos ??= new Repository<LicenseInfo>(_context);
+    public IRepository<AiConversation> AiConversations => _aiConversations ??= new Repository<AiConversation>(_context);
+    public IRepository<AiMessage> AiMessages => _aiMessages ??= new Repository<AiMessage>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

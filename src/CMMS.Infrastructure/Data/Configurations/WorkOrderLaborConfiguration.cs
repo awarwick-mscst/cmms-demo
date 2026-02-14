@@ -47,7 +47,7 @@ public class WorkOrderLaborConfiguration : IEntityTypeConfiguration<WorkOrderLab
 
         builder.Property(l => l.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         // Relationships
         builder.HasOne(l => l.User)

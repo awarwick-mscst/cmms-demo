@@ -128,7 +128,7 @@ public class DatabaseConfigService : IDatabaseConfigService
                     break;
 
                 case DatabaseProvider.PostgreSql:
-                    result = TestNotYetSupported("PostgreSQL");
+                    result = await TestPostgreSqlAsync(connectionString);
                     break;
 
                 case DatabaseProvider.MySql:
@@ -196,6 +196,23 @@ public class DatabaseConfigService : IDatabaseConfigService
             Success = true,
             Message = "Connection successful",
             ServerVersion = $"SQLite {version}"
+        };
+    }
+
+    private async Task<DatabaseTestResult> TestPostgreSqlAsync(string connectionString)
+    {
+        using var connection = new Npgsql.NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT version()";
+        var version = await command.ExecuteScalarAsync();
+
+        return new DatabaseTestResult
+        {
+            Success = true,
+            Message = "Connection successful",
+            ServerVersion = version?.ToString()?.Split('\n').FirstOrDefault()
         };
     }
 

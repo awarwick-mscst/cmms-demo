@@ -54,6 +54,10 @@ public class CmmsDbContext : DbContext
     // Licensing
     public DbSet<LicenseInfo> LicenseInfos => Set<LicenseInfo>();
 
+    // AI Assistant
+    public DbSet<AiConversation> AiConversations => Set<AiConversation>();
+    public DbSet<AiMessage> AiMessages => Set<AiMessage>();
+
     // Notifications
     public DbSet<NotificationQueue> NotificationQueue => Set<NotificationQueue>();
     public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();

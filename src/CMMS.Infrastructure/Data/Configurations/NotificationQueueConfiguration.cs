@@ -48,7 +48,7 @@ public class NotificationQueueConfiguration : IEntityTypeConfiguration<Notificat
 
         builder.Property(n => n.ScheduledFor)
             .HasColumnName("scheduled_for")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(n => n.ProcessedAt)
             .HasColumnName("processed_at");
@@ -66,7 +66,7 @@ public class NotificationQueueConfiguration : IEntityTypeConfiguration<Notificat
         // Audit fields
         builder.Property(n => n.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(n => n.CreatedBy)
             .HasColumnName("created_by");
@@ -92,13 +92,13 @@ public class NotificationQueueConfiguration : IEntityTypeConfiguration<Notificat
 
         // Indexes
         builder.HasIndex(n => new { n.Status, n.ScheduledFor })
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(n => n.RecipientUserId)
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         builder.HasIndex(n => new { n.ReferenceType, n.ReferenceId })
-            .HasFilter("[is_deleted] = 0");
+            .HasFilter(SqlDialect.SoftDeleteFilter());
 
         // Soft delete filter
         builder.HasQueryFilter(n => !n.IsDeleted);

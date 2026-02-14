@@ -28,7 +28,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
 
         builder.Property(r => r.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(r => r.UpdatedAt)
             .HasColumnName("updated_at");
@@ -62,7 +62,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.HasIndex(p => p.Name).IsUnique();
     }
@@ -81,7 +81,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 
         builder.Property(ur => ur.AssignedAt)
             .HasColumnName("assigned_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(ur => ur.AssignedBy)
             .HasColumnName("assigned_by");
@@ -111,7 +111,7 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
 
         builder.Property(rp => rp.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.HasOne(rp => rp.Role)
             .WithMany(r => r.RolePermissions)

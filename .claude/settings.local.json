@@ -19,7 +19,8 @@
       "Bash(dotnet sln:*)",
       "WebSearch",
       "Bash(dotnet add package:*)",
-      "Bash(dotnet add:*)"
+      "Bash(dotnet add:*)",
+      "Bash(grep:*)"
     ]
   }
 }

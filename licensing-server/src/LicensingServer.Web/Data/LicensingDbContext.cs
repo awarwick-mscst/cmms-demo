@@ -16,6 +16,7 @@ public class LicensingDbContext : DbContext
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
     public DbSet<Fido2Credential> Fido2Credentials => Set<Fido2Credential>();
     public DbSet<AdminLoginAuditLog> AdminLoginAuditLogs => Set<AdminLoginAuditLog>();
+    public DbSet<Release> Releases => Set<Release>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -81,7 +81,7 @@ public class PreventiveMaintenanceScheduleConfiguration : IEntityTypeConfigurati
         // Audit fields
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql(SqlDialect.UtcNow());
 
         builder.Property(p => p.CreatedBy)
             .HasColumnName("created_by");
